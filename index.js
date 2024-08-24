@@ -11,10 +11,10 @@ const cors = require("cors");
 const connectDB = require("./db/connectDB");
 
 //routes importations
-
+const authRoute = require("./route/authRoute");
 //middlewares importations
-// const notFoundMiddleware = require("./middleware/note-found");
-// const errorHandlerMiddleware = require("./middleware/error-handler");
+const notFoundMiddleware = require("./middleware/not-found");
+const errorHandlerMiddleware = require("./middleware/error-handler");
 //middlewares initialization
 app.use(morgan("tiny")); //to see the hit route in the console
 app.use(express.json()); // to get json form of res
@@ -28,10 +28,10 @@ app.use(
 );
 
 //route initialization
-
+app.use("api/v1/auth", authRoute);
 //errors initialization
-// app.use(notFoundMiddleware);
-// app.use(errorHandlerMiddleware);
+app.use(notFoundMiddleware);
+app.use(errorHandlerMiddleware);
 //starting the app
 const port = process.env.PORT || 5000;
 const start = async () => {
