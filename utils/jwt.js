@@ -17,4 +17,4 @@ const attachTokenToResponse = ({ res, userPayload }) => {
   });
   return token;
 };
-module.exports = { createJwt, isTokenVerified, attachTokenToResponse };
+module.exports = { isTokenVerified, attachTokenToResponse };

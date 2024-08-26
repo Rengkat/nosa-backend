@@ -1,6 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
 const User = require("../model/userModel");
+const { attachTokenToResponse, createUserPayload } = require("../utils");
 
 const register = async (req, res, next) => {
   const { firstName, surname, email, password } = req.body;
@@ -13,16 +14,33 @@ const register = async (req, res, next) => {
       throw new CustomError.BadRequestError("User already registered");
     }
     const user = await User.create({ firstName, surname, email, password });
-    res
-      .status(StatusCodes.CREATED)
-      .json({ user, message: "Registration successful", success: true });
+    res.status(StatusCodes.CREATED).json({ message: "Registration successful", success: true });
   } catch (error) {
     next(error);
   }
 };
 const login = async (req, res, next) => {
   try {
-    console.log("first");
+    const { email, password } = req.body;
+    if ((!email, !password)) {
+      throw new CustomError.BadRequestError("Please provide all credentials");
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new CustomError.NotFound("User not found");
+    }
+    const isPasswordMatched = await user.comparedPassword(password);
+    if (!isPasswordMatched) {
+      throw new CustomError.BadRequest("Please enter valid credentials");
+    }
+    const userPayload = createUserPayload(user);
+    const token = attachTokenToResponse({ res, userPayload });
+    res.status(StatusCodes.OK).json({
+      message: "login successfully",
+      user: userPayload,
+      success: true,
+      token,
+    });
   } catch (error) {
     next(error);
   }
