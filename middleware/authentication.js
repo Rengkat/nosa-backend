@@ -17,24 +17,21 @@ const authenticateUser = async (req, res, next) => {
 
     const user = isTokenVerified({ token });
 
-    // If verification fails or returns no user, throw an error
     if (!user) {
       throw new CustomError.UnauthenticatedError(
         "Authentication invalid - Token verification failed"
       );
     }
-
-    // Destructure user info and attach it to the request object
+    // Attach the user to the request object
     const { firstName, surname, id, role } = user;
     req.user = { firstName, surname, id, role };
 
-    // Proceed to the next middleware
     next();
   } catch (error) {
-    console.error(error); // Logging the actual error for debugging purposes
-    throw new CustomError.UnauthenticatedError("Authentication invalid");
+    next(error);
   }
 };
+
 const authorizationPermission = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
@@ -42,7 +39,9 @@ const authorizationPermission = (...roles) => {
         `User with role ${req.user.role} is not authorized. Allowed roles: ${roles.join(", ")}`
       );
 
-      throw new CustomError.UnauthorizedError("You are not authorized!");
+      throw new CustomError.UnauthorizedError(
+        `You are not authorized! Only You are not authorized!`
+      );
     }
 
     next();
