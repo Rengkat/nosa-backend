@@ -78,8 +78,8 @@ const UserSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["superAdmin", "setAdmin", "user"],
-    default: "user",
+    enum: ["superAdmin", "setAdmin", "member"],
+    default: "member",
     required: true,
   },
   isSetExco: {
