@@ -35,5 +35,18 @@ const authenticateUser = async (req, res, next) => {
     throw new CustomError.UnauthenticatedError("Authentication invalid");
   }
 };
+const authorizationPermission = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      console.error(
+        `User with role ${req.user.role} is not authorized. Allowed roles: ${roles.join(", ")}`
+      );
 
-module.exports = { authenticateUser };
+      throw new CustomError.UnauthorizedError("You are not authorized!");
+    }
+
+    next();
+  };
+};
+
+module.exports = { authenticateUser, authorizationPermission };
