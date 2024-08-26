@@ -19,4 +19,14 @@ const getSingleUser = async (req, res, next) => {
   }
   res.status(StatusCodes.OK).json({ success: true, user });
 };
-module.exports = { getAllUsers, getSingleUser };
+const deleteUser = async (req, res) => {
+  const userId = req.params.userId;
+  const user = await User.findByIdAndDelete(userId);
+
+  if (!user) {
+    return res.status(StatusCodes.NOT_FOUND).json({ success: false, message: "User not found" });
+  }
+
+  res.status(StatusCodes.OK).json({ success: true, message: "User successfully deleted" });
+};
+module.exports = { getAllUsers, getSingleUser, deleteUser };

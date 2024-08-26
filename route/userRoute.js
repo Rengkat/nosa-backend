@@ -1,8 +1,8 @@
 const express = require("express");
-const { getAllUsers, getSingleUser } = require("../controllers/userController");
+const { getAllUsers, getSingleUser, deleteUser } = require("../controllers/userController");
 // const { authenticateUser, authorizationPermission } = require("../middleware/authentication");
 
 const router = express.Router();
 router.get("/", getAllUsers);
-router.route("/:userId").get(getSingleUser);
+router.route("/:userId").get(getSingleUser).delete(deleteUser);
 module.exports = router;
