@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-
+const validator = require("validator");
+const bcrypt = require("bcryptjs");
 const UserSchema = new mongoose.Schema({
   firstName: {
     type: String,
@@ -12,29 +13,47 @@ const UserSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, "Please provide email"],
-    unique: true,
+    validate: {
+      validator: validator.isEmail,
+      message: "Please provide a valid email",
+    },
   },
   phone: {
     type: String,
-    required: [true, "Please provide phone"],
+  },
+  password: {
+    type: String,
+    required: [true, "Please provide password"],
+    validate: {
+      validator: function (value) {
+        return validator.isStrongPassword(value, {
+          minLength: 6,
+          minLowercase: 1,
+          minUppercase: 1,
+          minNumbers: 1,
+          minSymbols: 1,
+        });
+      },
+      message: "Enter a stronger password",
+    },
   },
   sex: {
     type: String,
     enum: ["Male", "Female"],
-    required: true,
+    required: false,
   },
   dateOfBirth: {
     type: Date,
-    required: true,
+    required: false,
   },
   currentAddress: {
     type: String,
-    required: true,
+    required: false,
   },
   employmentStatus: {
     type: String,
     enum: ["Employed", "Unemployed", "Self-Employed", "Student", "Retired"],
-    required: true,
+    required: false, // Optional for registration
   },
   currentJob: {
     type: String,
@@ -46,16 +65,16 @@ const UserSchema = new mongoose.Schema({
   },
   stateOfResidence: {
     type: String,
-    required: true,
+    required: false, // Optional for registration
   },
   yearOfGraduation: {
     type: Number,
-    required: [true, "Please provide your year of graduation"],
+    required: false, // Optional for registration
   },
   maritalStatus: {
     type: String,
     enum: ["single", "married", "divorced", "complicated"],
-    required: true,
+    required: false, // Optional for registration
   },
   role: {
     type: String,
@@ -63,7 +82,6 @@ const UserSchema = new mongoose.Schema({
     default: "user",
     required: true,
   },
-
   isSetExco: {
     type: Boolean,
     default: false,
@@ -72,10 +90,9 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-
   setExcoOffice: {
     type: String,
-    required: true,
+    required: false, // Optional for registration
   },
   isWhomWeAreProudOf: {
     type: Boolean,
@@ -83,7 +100,7 @@ const UserSchema = new mongoose.Schema({
   },
   summaryOfProfile: {
     type: String,
-    required: true,
+    required: false, // Optional for registration
   },
   isVerified: {
     type: Boolean,
@@ -96,7 +113,11 @@ const UserSchema = new mongoose.Schema({
     required: true,
   },
 });
-
-const User = mongoose.model("User", UserSchema);
-
-module.exports = User;
+UserSchema.pre("save", async function () {
+  if (!this.isModified("password")) {
+    return;
+  }
+  const salt = await bcrypt.genSalt(12);
+  this.password = await bcrypt.hash(this.password, salt);
+});
+module.exports = mongoose.model("User", UserSchema);

@@ -1,6 +1,6 @@
 class CustomApiError extends Error {
   constructor(message) {
-    supper(message);
+    super(message);
   }
 }
 module.exports = CustomApiError;
