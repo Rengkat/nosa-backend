@@ -1,6 +1,6 @@
 const CustomError = require("../errors");
 const { isTokenVerified } = require("../utils");
-
+const User = require("../model/userModel");
 const authenticateUser = async (req, res, next) => {
   try {
     let token;
@@ -31,21 +31,44 @@ const authenticateUser = async (req, res, next) => {
     next(error);
   }
 };
-
-const authorizationPermission = (...roles) => {
+const superAdminAuthorizationPermission = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      console.error(
-        `User with role ${req.user.role} is not authorized. Allowed roles: ${roles.join(", ")}`
-      );
-
-      throw new CustomError.UnauthorizedError(
-        `You are not authorized! Only You are not authorized!`
-      );
+      return next(new CustomError.UnauthorizedError("You are not authorized!"));
+    }
+    next();
+  };
+};
+const superAdminAndSetAdminAuthorizationPermission = (...roles) => {
+  return async (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(new CustomError.UnauthorizedError("You are not authorized!"));
     }
 
+    if (req.user.role === "setAdmin") {
+      const { userId } = req.params;
+
+      // Fetch the user to be updated
+      const userToBeUpdated = await User.findById(userId);
+      if (!userToBeUpdated) {
+        return next(new CustomError.NotFoundError("User not found"));
+      }
+
+      // Compare the graduation year
+      if (req.user.yearOfGraduation !== userToBeUpdated.yearOfGraduation) {
+        return next(
+          new CustomError.UnauthorizedError(
+            "Set Admins can only update users with the same graduation year"
+          )
+        );
+      }
+    }
     next();
   };
 };
 
-module.exports = { authenticateUser, authorizationPermission };
+module.exports = {
+  authenticateUser,
+  superAdminAuthorizationPermission,
+  superAdminAndSetAdminAuthorizationPermission,
+};

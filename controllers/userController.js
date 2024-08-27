@@ -32,16 +32,16 @@ const deleteUser = async (req, res) => {
 const updateCurrentUser = async (req, res, next) => {
   try {
     const { id } = req.user;
-
     const user = await User.findById(id);
+
     if (!user) {
       throw new CustomError.NotFoundError("User not found");
     }
 
-    const updatedUser = await User.findByIdAndUpdate(id, req.body, {
-      new: true,
-      runValidators: true, // Ensure validation is run on the updated fields
-    });
+    // Update user fields
+    user.set(req.body);
+
+    await user.save();
 
     res.status(StatusCodes.OK).json({
       success: true,
@@ -51,5 +51,26 @@ const updateCurrentUser = async (req, res, next) => {
     next(error);
   }
 };
+const updateUser = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
 
-module.exports = { getAllUsers, getSingleUser, deleteUser, updateCurrentUser };
+    if (!user) {
+      throw new CustomError.NotFoundError("User not found");
+    }
+
+    user.set(req.body);
+
+    await user.save();
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "User credentials were successfully updated",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { getAllUsers, getSingleUser, deleteUser, updateCurrentUser, updateUser };

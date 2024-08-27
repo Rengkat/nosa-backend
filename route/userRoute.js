@@ -4,9 +4,13 @@ const {
   getSingleUser,
   deleteUser,
   updateCurrentUser,
+  updateUser,
 } = require("../controllers/userController");
-const { authenticateUser, authorizationPermission } = require("../middleware/authentication");
-// const { authenticateUser, authorizationPermission } = require("../middleware/authentication");
+const {
+  authenticateUser,
+  superAdminAuthorizationPermission,
+  superAdminAndSetAdminAuthorizationPermission,
+} = require("../middleware/authentication");
 
 const router = express.Router();
 router.get("/", getAllUsers);
@@ -14,6 +18,10 @@ router.put("/updateCurrentUser", authenticateUser, updateCurrentUser);
 router
   .route("/:userId")
   .get(getSingleUser)
-  .delete([authenticateUser, authorizationPermission("superAdmin")], deleteUser);
+  .delete([authenticateUser, superAdminAuthorizationPermission("superAdmin")], deleteUser)
+  .patch(
+    [authenticateUser, superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin")],
+    updateUser
+  );
 
 module.exports = router;

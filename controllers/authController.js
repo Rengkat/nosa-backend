@@ -9,16 +9,23 @@ const register = async (req, res, next) => {
     if (!firstName || !surname || !email || !password) {
       throw new CustomError.BadRequestError("Please provide all credentials");
     }
+
     const existUser = await User.findOne({ email });
     if (existUser) {
       throw new CustomError.BadRequestError("User already registered");
     }
-    const user = await User.create({ firstName, surname, email, password });
+
+    const userCount = await User.countDocuments();
+    const assignedRole = userCount === 0 ? "superAdmin" : "member";
+
+    await User.create({ firstName, surname, email, password, role: assignedRole });
+
     res.status(StatusCodes.CREATED).json({ message: "Registration successful", success: true });
   } catch (error) {
     next(error);
   }
 };
+
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
