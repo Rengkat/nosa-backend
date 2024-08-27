@@ -3,7 +3,7 @@ const {
   addOfficial,
   getAllOfficials,
   getSingleOfficial,
-  updateOfficial,
+  updateOfficialPost,
   deleteOfficial,
 } = require("../controllers/nationalOfficialsController");
 const {

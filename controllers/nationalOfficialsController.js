@@ -14,7 +14,9 @@ const addOfficial = async (req, res, next) => {
       throw new CustomError.NotFoundError(`User is not found`);
     }
     await NationalOfficials.create({ user: userId, post });
-    res.status(StatusCodes.CREATED).json({ message: "Official successfully added", success: true });
+    res
+      .status(StatusCodes.CREATED)
+      .json({ message: `The ${post} successfully added`, success: true });
   } catch (error) {
     next(error);
   }
@@ -31,7 +33,7 @@ const getAllOfficials = async (req, res, next) => {
 };
 
 const getSingleOfficial = async (req, res, next) => {};
-const updateOfficial = async (req, res, next) => {
+const updateOfficialPost = async (req, res, next) => {
   try {
     const { userId, post } = req.body;
     const official = await NationalOfficials.findOne({ post });
@@ -45,13 +47,24 @@ const updateOfficial = async (req, res, next) => {
     official.user = userId;
     await official.save();
     res.status(StatusCodes.OK).json({ message: `The post of the ${post} successfully updated` });
+  } catch (error) {
+    next(error);
+  }
+};
+const deleteOfficial = async (req, res, next) => {
+  try {
+    const { userId } = req.body;
+    if (!userId) {
+      throw new CustomError.BadRequestError("Please provide user id");
+    }
+    await NationalOfficials.findOneAndDelete({ user: userId });
+    res.status(StatusCodes.OK).json({ message: `Official successfully deleted` });
   } catch (error) {}
 };
-const deleteOfficial = async (req, res, next) => {};
 module.exports = {
   addOfficial,
   getSingleOfficial,
-  updateOfficial,
+  updateOfficialPost,
   deleteOfficial,
   getAllOfficials,
 };
