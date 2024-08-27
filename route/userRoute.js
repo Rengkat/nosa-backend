@@ -18,7 +18,7 @@ router.put("/updateCurrentUser", authenticateUser, updateCurrentUser);
 router
   .route("/:userId")
   .get(getSingleUser)
-  .delete([authenticateUser, superAdminAuthorizationPermission("superAdmin")], deleteUser)
+  .delete([authenticateUser, superAdminAuthorizationPermission], deleteUser)
   .patch(
     [authenticateUser, superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin")],
     updateUser

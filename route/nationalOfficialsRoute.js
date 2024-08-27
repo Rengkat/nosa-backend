@@ -1,9 +1,19 @@
 const express = require("express");
-const {} = require("../controllers/nationalOfficialsController");
+const {
+  addOfficial,
+  getAllOfficials,
+  getSingleOfficial,
+  updateOfficial,
+  deleteOfficial,
+} = require("../controllers/nationalOfficialsController");
 const {
   authenticateUser,
   superAdminAuthorizationPermission,
   superAdminAndSetAdminAuthorizationPermission,
 } = require("../middleware/authentication");
 const router = express.Router();
+router
+  .route("/")
+  .post([authenticateUser, superAdminAuthorizationPermission], addOfficial)
+  .get([authenticateUser, superAdminAuthorizationPermission], getAllOfficials);
 module.exports = router;

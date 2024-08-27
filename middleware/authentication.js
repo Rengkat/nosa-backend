@@ -31,14 +31,13 @@ const authenticateUser = async (req, res, next) => {
     next(error);
   }
 };
-const superAdminAuthorizationPermission = (...roles) => {
-  return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return next(new CustomError.UnauthorizedError("You are not authorized!"));
-    }
-    next();
-  };
+const superAdminAuthorizationPermission = (req, res, next) => {
+  if (req.user.role !== "superAdmin") {
+    return next(new CustomError.UnauthorizedError("You are not authorized!"));
+  }
+  next();
 };
+
 const superAdminAndSetAdminAuthorizationPermission = (...roles) => {
   return async (req, res, next) => {
     if (!roles.includes(req.user.role)) {
