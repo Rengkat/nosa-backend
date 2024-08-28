@@ -1,6 +1,9 @@
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
 const User = require("../model/userModel");
+const path = require("node:path");
+const cloudinary = require("cloudinary").v2;
+const fs = require("node:fs");
 const getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find({}).select("-password");
@@ -73,4 +76,24 @@ const updateUser = async (req, res, next) => {
   }
 };
 
-module.exports = { getAllUsers, getSingleUser, deleteUser, updateCurrentUser, updateUser };
+const uploadUserImage = async (req, res, next) => {
+  try {
+    const result = await cloudinary.uploader.upload(req.files.image.tempFilePath, {
+      use_filename: true,
+      folder: process.env.CLOUTINARY_FOLDER_NAME,
+    });
+    fs.unlinkSync(req.files.image.tempFilePath);
+    return res.status(StatusCodes.CREATED).json({ imgUrl: result.secure_url, success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  getAllUsers,
+  getSingleUser,
+  deleteUser,
+  updateCurrentUser,
+  updateUser,
+  uploadUserImage,
+};

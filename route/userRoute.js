@@ -5,6 +5,7 @@ const {
   deleteUser,
   updateCurrentUser,
   updateUser,
+  uploadUserImage,
 } = require("../controllers/userController");
 const {
   authenticateUser,
@@ -14,6 +15,7 @@ const {
 
 const router = express.Router();
 router.get("/", getAllUsers);
+router.route("/upload").post(uploadUserImage);
 router.put("/updateCurrentUser", authenticateUser, updateCurrentUser);
 router
   .route("/:userId")

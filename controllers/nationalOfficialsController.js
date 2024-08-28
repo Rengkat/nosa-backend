@@ -2,21 +2,30 @@ const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
 const NationalOfficials = require("../model/nationalOfficialsModel");
 const User = require("../model/userModel");
+
 const addOfficial = async (req, res, next) => {
   try {
     const { userId, post } = req.body;
+
     if (!userId || !post) {
       throw new CustomError.BadRequestError("Please provide all credentials");
     }
-    // check if is already a user
+
+    // Check if the user exists
     const isValidUser = await User.findById(userId);
     if (!isValidUser) {
-      throw new CustomError.NotFoundError(`User is not found`);
+      throw new CustomError.NotFoundError("User not found");
     }
+
     await NationalOfficials.create({ user: userId, post });
-    res
-      .status(StatusCodes.CREATED)
-      .json({ message: `The ${post} successfully added`, success: true });
+
+    isValidUser.isNationalExco = true;
+    await isValidUser.save();
+
+    res.status(StatusCodes.CREATED).json({
+      message: `The ${post} successfully added`,
+      success: true,
+    });
   } catch (error) {
     next(error);
   }

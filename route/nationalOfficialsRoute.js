@@ -12,8 +12,10 @@ const {
   superAdminAndSetAdminAuthorizationPermission,
 } = require("../middleware/authentication");
 const router = express.Router();
+
 router
   .route("/")
   .post([authenticateUser, superAdminAuthorizationPermission], addOfficial)
   .get([authenticateUser, superAdminAuthorizationPermission], getAllOfficials);
+
 module.exports = router;
