@@ -4,9 +4,31 @@ const User = require("../model/userModel");
 const path = require("node:path");
 const cloudinary = require("cloudinary").v2;
 const fs = require("node:fs");
+const { checkPermission } = require("../utils");
 const getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find({}).select("-password");
+    res.status(StatusCodes.OK).json({ success: true, users });
+  } catch (error) {
+    next(error);
+  }
+};
+const getAllSameSetUsers = async (req, res, next) => {
+  try {
+    const { set } = req.params;
+    console.log(set);
+    if (!set) {
+      throw new CustomError.BadRequestError("Please provide set");
+    }
+    const users = await User.find({ yearOfGraduation: set }).select("-password");
+    res.status(StatusCodes.OK).json({ success: true, users });
+  } catch (error) {
+    next(error);
+  }
+};
+const getAllSetAdmins = async (req, res, next) => {
+  try {
+    const users = await User.find({ role: "setAdmin" }).sort("yearOfGraduation");
     res.status(StatusCodes.OK).json({ success: true, users });
   } catch (error) {
     next(error);
@@ -20,6 +42,7 @@ const getSingleUser = async (req, res, next) => {
     const error = new CustomError.NotFoundError(`No user with id: ${userId}`);
     return next(error);
   }
+
   res.status(StatusCodes.OK).json({ success: true, user });
 };
 const deleteUser = async (req, res) => {
@@ -29,7 +52,6 @@ const deleteUser = async (req, res) => {
   if (!user) {
     return res.status(StatusCodes.NOT_FOUND).json({ success: false, message: "User not found" });
   }
-
   res.status(StatusCodes.OK).json({ success: true, message: "User successfully deleted" });
 };
 const updateCurrentUser = async (req, res, next) => {
@@ -58,13 +80,14 @@ const updateUser = async (req, res, next) => {
   try {
     const { userId } = req.params;
     const user = await User.findById(userId);
-
+    const currentUser = await User.findById(req.user.id);
     if (!user) {
       throw new CustomError.NotFoundError("User not found");
     }
 
-    user.set(req.body);
+    checkPermission(currentUser, user);
 
+    user.set(req.body);
     await user.save();
 
     res.status(StatusCodes.OK).json({
@@ -96,4 +119,5 @@ module.exports = {
   updateCurrentUser,
   updateUser,
   uploadUserImage,
+  getAllSameSetUsers,
 };

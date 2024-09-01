@@ -43,29 +43,9 @@ const superAdminAndSetAdminAuthorizationPermission = (...roles) => {
     if (!roles.includes(req.user.role)) {
       return next(new CustomError.UnauthorizedError("You are not authorized!"));
     }
-
-    if (req.user.role === "setAdmin") {
-      const { userId } = req.params;
-
-      // Fetch the user to be updated
-      const userToBeUpdated = await User.findById(userId);
-      if (!userToBeUpdated) {
-        return next(new CustomError.NotFoundError("User not found"));
-      }
-
-      // Compare the graduation year
-      if (req.user.yearOfGraduation !== userToBeUpdated.yearOfGraduation) {
-        return next(
-          new CustomError.UnauthorizedError(
-            "Set Admins can only update users with the same graduation year"
-          )
-        );
-      }
-    }
     next();
   };
 };
-
 module.exports = {
   authenticateUser,
   superAdminAuthorizationPermission,

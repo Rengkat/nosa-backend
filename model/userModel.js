@@ -53,7 +53,7 @@ const UserSchema = new mongoose.Schema({
   employmentStatus: {
     type: String,
     enum: ["Employed", "Unemployed", "Self-Employed", "Student", "Retired"],
-    required: false, // Optional for registration
+    required: false,
   },
   currentJob: {
     type: String,
@@ -65,16 +65,16 @@ const UserSchema = new mongoose.Schema({
   },
   stateOfResidence: {
     type: String,
-    required: false, // Optional for registration
+    required: false,
   },
   yearOfGraduation: {
     type: Number,
-    required: false, // Optional for registration
+    required: false,
   },
   maritalStatus: {
     type: String,
     enum: ["single", "married", "divorced", "complicated"],
-    required: false, // Optional for registration
+    required: false,
   },
   role: {
     type: String,
@@ -92,7 +92,7 @@ const UserSchema = new mongoose.Schema({
   },
   setExcoOffice: {
     type: String,
-    required: false, // Optional for registration
+    required: false,
   },
   isWhomWeAreProudOf: {
     type: Boolean,
@@ -100,7 +100,7 @@ const UserSchema = new mongoose.Schema({
   },
   summaryOfProfile: {
     type: String,
-    required: false, // Optional for registration
+    required: false,
   },
   isVerified: {
     type: Boolean,

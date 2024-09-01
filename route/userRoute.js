@@ -1,6 +1,7 @@
 const express = require("express");
 const {
   getAllUsers,
+  getAllSameSetUsers,
   getSingleUser,
   deleteUser,
   updateCurrentUser,
@@ -15,7 +16,7 @@ const {
 
 const router = express.Router();
 router.get("/", getAllUsers);
-router.route("/upload").post(uploadUserImage);
+router.route("/upload").post(authenticateUser, uploadUserImage);
 router.put("/updateCurrentUser", authenticateUser, updateCurrentUser);
 router
   .route("/:userId")
@@ -25,5 +26,4 @@ router
     [authenticateUser, superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin")],
     updateUser
   );
-
 module.exports = router;
