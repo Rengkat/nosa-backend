@@ -14,7 +14,7 @@ const connectDB = require("./db/connectDB");
 const authRoute = require("./route/authRoute");
 const userRoute = require("./route/userRoute");
 const nationalOfficialsRoute = require("./route/nationalOfficialsRoute");
-const setRout = require("./route/setRoute");
+const setRoute = require("./route/setRoute");
 //middlewares importations
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
@@ -34,7 +34,7 @@ app.use(
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/national-officials", nationalOfficialsRoute);
-app.use("/api/nosa-sets", setRout);
+app.use("/api/nosa-sets", setRoute);
 //errors initialization
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);

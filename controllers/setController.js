@@ -4,22 +4,38 @@ const NosaSet = require("../model/setModel");
 const User = require("../model/userModel");
 const createSet = async (req, res, next) => {
   try {
-    const { nosaSet, userId } = req.body;
-    if (!nosaSet || !userId) {
-      throw new CustomError.BadRequestError("Please provide all credentials");
-    }
-    const existSet = await NosaSet.findOne({ name: nosaSet });
-    if (existSet) {
-      throw new CustomError.BadRequestError("This set already exist");
-    }
-    await NosaSet.create({ members: userId, name: nosaSet });
-    // res.status(StatusCodes.CREATED).json({message:})
+    const { nosaSet } = req.body;
+    if (!nosaSet) throw new CustomError.BadRequestError("Please provide set year");
+
+    const existingSet = await NosaSet.findOne({ name: nosaSet });
+    if (existingSet) throw new CustomError.BadRequestError("Set already exists");
+
+   await NosaSet.create({ name: nosaSet });
+    res.status(StatusCodes.CREATED).json({ message: "A set created successfully", success: true });
   } catch (error) {
     next(error);
   }
 };
-const getAllSets = async (req, res, next) => {};
+
+const getAllSets = async (req, res, next) => {
+  try {
+    const sets = await NosaSet.find();
+    res.status(StatusCodes.OK).json({ sets });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getSetMembers = async (req, res, next) => {
+  try {
+    const { set } = req.params;
+    const members = await User.find({ yearOfGraduation: set }).select("-password");
+    res.status(StatusCodes.OK).json({ members });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const updateSet = async (req, res, next) => {};
-const getSetMembers = async (req, res, next) => {};
 const getSetAdmins = async (req, res, next) => {};
 module.exports = { createSet, getAllSets, updateSet, getSetAdmins, getSetMembers };

@@ -68,7 +68,7 @@ const UserSchema = new mongoose.Schema({
     required: false,
   },
   yearOfGraduation: {
-    type: Number,
+    type: String,
     required: false,
   },
   maritalStatus: {
@@ -113,6 +113,13 @@ const UserSchema = new mongoose.Schema({
     required: true,
   },
 });
+UserSchema.virtual("nosaSet", {
+  ref: "Set",
+  localField: "yearOfGraduation",
+  foreignField: "name", // Assuming 'name' in Set schema is the yearOfGraduation
+  justOne: true,
+});
+
 UserSchema.pre("save", async function () {
   if (!this.isModified("password")) {
     return;
