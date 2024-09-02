@@ -16,7 +16,7 @@ const getAllUsers = async (req, res, next) => {
 const getAllSameSetUsers = async (req, res, next) => {
   try {
     const { set } = req.params;
-    console.log(set);
+    // console.log(set);
     if (!set) {
       throw new CustomError.BadRequestError("Please provide set");
     }

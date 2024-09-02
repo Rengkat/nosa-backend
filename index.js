@@ -34,7 +34,7 @@ app.use(
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/national-officials", nationalOfficialsRoute);
-app.use("/api/set", setRout);
+app.use("/api/nosa-sets", setRout);
 //errors initialization
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
