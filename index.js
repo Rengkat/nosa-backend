@@ -15,6 +15,7 @@ const authRoute = require("./route/authRoute");
 const userRoute = require("./route/userRoute");
 const nationalOfficialsRoute = require("./route/nationalOfficialsRoute");
 const setRoute = require("./route/setRoute");
+const galleryRoute = require("../route/galleryRoute");
 //middlewares importations
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
@@ -35,6 +36,7 @@ app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/national-officials", nationalOfficialsRoute);
 app.use("/api/nosa-sets", setRoute);
+app.use("/api/gallery", galleryRoute);
 //errors initialization
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
@@ -50,3 +52,5 @@ const start = async () => {
   }
 };
 start();
+// 7091385034; wema data site
+// 08079353851

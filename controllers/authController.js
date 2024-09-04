@@ -29,7 +29,7 @@ const register = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    if ((!email, !password)) {
+    if (!email || !password) {
       throw new CustomError.BadRequestError("Please provide all credentials");
     }
     const user = await User.findOne({ email });

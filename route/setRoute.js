@@ -2,7 +2,6 @@ const express = require("express");
 const {
   createSet,
   getAllSets,
-  updateSet,
   getSetAdmins,
   getSetMembers,
 } = require("../controllers/setController");
@@ -13,9 +12,20 @@ const {
 } = require("../middleware/authentication");
 
 const router = express.Router();
-router.route("/").get(getAllSets).post(createSet);
-// router.route("/upload").post(authenticateUser, uploadUserImage);
-router.put("/updateSet", authenticateUser, updateSet);
-router.route("/:set").get(getSetMembers);
+// Route to create a new NOSA set and get all existing sets
+router
+  .route("/")
+  .get(getAllSets)
+  .post([authenticateUser, superAdminAuthorizationPermission], createSet);
+
+router
+  .route("/setAdmins")
+  .get(
+    [authenticateUser, superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin")],
+    getSetAdmins
+  );
+
+// Route to get all members of a specific NOSA set
+router.route("/:set/members").get(authenticateUser, getSetMembers);
 
 module.exports = router;

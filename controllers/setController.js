@@ -10,7 +10,7 @@ const createSet = async (req, res, next) => {
     const existingSet = await NosaSet.findOne({ name: nosaSet });
     if (existingSet) throw new CustomError.BadRequestError("Set already exists");
 
-   await NosaSet.create({ name: nosaSet });
+    await NosaSet.create({ name: nosaSet });
     res.status(StatusCodes.CREATED).json({ message: "A set created successfully", success: true });
   } catch (error) {
     next(error);
@@ -36,6 +36,12 @@ const getSetMembers = async (req, res, next) => {
   }
 };
 
-const updateSet = async (req, res, next) => {};
-const getSetAdmins = async (req, res, next) => {};
-module.exports = { createSet, getAllSets, updateSet, getSetAdmins, getSetMembers };
+const getSetAdmins = async (req, res, next) => {
+  try {
+    const setAdmin = await User.find({ role: "setAdmin" })
+      .sort("-yearOfGraduation")
+      .select("-password");
+    res.status(StatusCodes.OK).json({ setAdmin });
+  } catch (error) {}
+};
+module.exports = { createSet, getAllSets, getSetAdmins, getSetMembers };

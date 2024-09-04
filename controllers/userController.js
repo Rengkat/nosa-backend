@@ -1,6 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
 const User = require("../model/userModel");
+const NosaSet = require("../model/setModel");
 const path = require("node:path");
 const cloudinary = require("cloudinary").v2;
 const fs = require("node:fs");
@@ -13,27 +14,7 @@ const getAllUsers = async (req, res, next) => {
     next(error);
   }
 };
-const getAllSameSetUsers = async (req, res, next) => {
-  try {
-    const { set } = req.params;
-    // console.log(set);
-    if (!set) {
-      throw new CustomError.BadRequestError("Please provide set");
-    }
-    const users = await User.find({ yearOfGraduation: set }).select("-password");
-    res.status(StatusCodes.OK).json({ success: true, users });
-  } catch (error) {
-    next(error);
-  }
-};
-const getAllSetAdmins = async (req, res, next) => {
-  try {
-    const users = await User.find({ role: "setAdmin" }).sort("yearOfGraduation");
-    res.status(StatusCodes.OK).json({ success: true, users });
-  } catch (error) {
-    next(error);
-  }
-};
+
 const getSingleUser = async (req, res, next) => {
   const { userId } = req.params;
 
@@ -56,17 +37,36 @@ const deleteUser = async (req, res) => {
 };
 const updateCurrentUser = async (req, res, next) => {
   try {
-    const { id } = req.user;
-    const user = await User.findById(id);
+    const { id } = req.user; // Assuming req.user contains the authenticated user's ID
+    const { yearOfGraduation } = req.body;
 
+    const user = await User.findById(id);
     if (!user) {
       throw new CustomError.NotFoundError("User not found");
+    }
+    if (!yearOfGraduation) {
+      throw new CustomError.NotFoundError("Provide all details");
+    }
+
+    const nosaSet = await NosaSet.findOne({ name: yearOfGraduation });
+    if (!nosaSet) {
+      throw new CustomError.NotFoundError("NOSA Set not found");
     }
 
     // Update user fields
     user.set(req.body);
 
+    // Set the user's nosaSet reference
+    user.nosaSet = nosaSet._id;
+
+    // Save the updated user
     await user.save();
+
+    // Add user to the NOSA Set's members array if not already added
+    if (!nosaSet.members.includes(id)) {
+      nosaSet.members.push(id);
+      await nosaSet.save(); // Save the updated NOSA Set
+    }
 
     res.status(StatusCodes.OK).json({
       success: true,
@@ -119,5 +119,4 @@ module.exports = {
   updateCurrentUser,
   updateUser,
   uploadUserImage,
-  getAllSameSetUsers,
 };

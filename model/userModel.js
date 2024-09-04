@@ -71,6 +71,11 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  nosaSet: {
+    type: mongoose.Types.ObjectId,
+    ref: "Set",
+    required: false,
+  },
   maritalStatus: {
     type: String,
     enum: ["single", "married", "divorced", "complicated"],
@@ -112,12 +117,6 @@ const UserSchema = new mongoose.Schema({
     default: "active",
     required: true,
   },
-});
-UserSchema.virtual("nosaSet", {
-  ref: "Set",
-  localField: "yearOfGraduation",
-  foreignField: "name", // Assuming 'name' in Set schema is the yearOfGraduation
-  justOne: true,
 });
 
 UserSchema.pre("save", async function () {
