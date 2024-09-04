@@ -15,7 +15,7 @@ const authRoute = require("./route/authRoute");
 const userRoute = require("./route/userRoute");
 const nationalOfficialsRoute = require("./route/nationalOfficialsRoute");
 const setRoute = require("./route/setRoute");
-const galleryRoute = require("../route/galleryRoute");
+const galleryRoute = require("./route/galleryRoute");
 //middlewares importations
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");

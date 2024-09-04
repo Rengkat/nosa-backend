@@ -1,9 +1,11 @@
+const express = require("express");
 const {
   addToGallery,
   updateGallery,
   removeFromGallery,
   getAllGalleryImages,
   getSingleGalleryImage,
+  uploadImage,
 } = require("../controllers/galleryController");
 const {
   authenticateUser,
@@ -16,6 +18,7 @@ router
   .route("/")
   .post([authenticateUser, superAdminAuthorizationPermission], addToGallery)
   .get(getAllGalleryImages);
+router.post("/uploadImage", [authenticateUser, superAdminAuthorizationPermission], uploadImage);
 router
   .route("/:id")
   .get(getSingleGalleryImage)
