@@ -3,6 +3,7 @@ const CustomError = require("../errors");
 const Gallery = require("../model/galleryModel");
 const mongoose = require("mongoose");
 const cloudinary = require("cloudinary").v2;
+const fs = require("node:fs");
 
 const fs = require("fs");
 

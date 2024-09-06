@@ -10,7 +10,6 @@ const {
 const {
   authenticateUser,
   superAdminAuthorizationPermission,
-  superAdminAndSetAdminAuthorizationPermission,
 } = require("../middleware/authentication");
 
 const router = express.Router();
