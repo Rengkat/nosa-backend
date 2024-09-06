@@ -101,17 +101,31 @@ const updateUser = async (req, res, next) => {
 
 const uploadUserImage = async (req, res, next) => {
   try {
+    if (!req.files || !req.files.image) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "No image file uploaded", success: false });
+    }
+
+    if (!fs.existsSync(req.files.image.tempFilePath)) {
+      // the file path
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "File not found", success: false });
+    }
+
     const result = await cloudinary.uploader.upload(req.files.image.tempFilePath, {
       use_filename: true,
-      folder: process.env.CLOUTINARY_FOLDER_NAME,
+      folder: process.env.CLOUTINARY_FOLDER_NAME_USER_IMAGES,
     });
+
     fs.unlinkSync(req.files.image.tempFilePath);
+
     return res.status(StatusCodes.CREATED).json({ imgUrl: result.secure_url, success: true });
   } catch (error) {
     next(error);
   }
 };
-
 module.exports = {
   getAllUsers,
   getSingleUser,

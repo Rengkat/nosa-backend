@@ -15,7 +15,7 @@ const {
 
 const router = express.Router();
 router.get("/", getAllUsers);
-router.route("/upload").post(authenticateUser, uploadUserImage);
+router.route("/uploadUserImage").post(authenticateUser, uploadUserImage);
 router.put("/updateCurrentUser", authenticateUser, updateCurrentUser);
 router
   .route("/:userId")
