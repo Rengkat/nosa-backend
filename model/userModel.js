@@ -1,6 +1,46 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+
+const SocialMediaSchema = new mongoose.Schema({
+  platform: {
+    type: String,
+    enum: ["twitter", "linkedin", "facebook", "email"],
+    required: true,
+  },
+  url: {
+    type: String,
+    required: true,
+    validate: {
+      validator: validator.isURL,
+      message: "Please provide a valid URL",
+    },
+  },
+});
+
+const EducationSchema = new mongoose.Schema({
+  primaryEducation: {
+    type: String,
+    required: false,
+  },
+  secondaryEducation: {
+    type: [String],
+    required: false,
+  },
+  undergraduate: {
+    type: [String],
+    required: false,
+  },
+  postGraduate: {
+    type: [String],
+    required: false,
+  },
+  professionalTrainings: {
+    type: [String],
+    required: false,
+  },
+});
+
 const UserSchema = new mongoose.Schema({
   firstName: {
     type: String,
@@ -37,22 +77,8 @@ const UserSchema = new mongoose.Schema({
       message: "Enter a stronger password",
     },
   },
-  sex: {
+  title: {
     type: String,
-    enum: ["Male", "Female"],
-    required: false,
-  },
-  dateOfBirth: {
-    type: Date,
-    required: false,
-  },
-  currentAddress: {
-    type: String,
-    required: false,
-  },
-  employmentStatus: {
-    type: String,
-    enum: ["Employed", "Unemployed", "Self-Employed", "Student", "Retired"],
     required: false,
   },
   currentJob: {
@@ -63,17 +89,27 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
-  stateOfResidence: {
-    type: String,
-    required: false,
-  },
   yearOfGraduation: {
     type: String,
     required: false,
   },
-  nosaSet: {
+  setOf: {
     type: mongoose.Types.ObjectId,
     ref: "Set",
+    required: false,
+  },
+  position: {
+    type: String,
+    required: false,
+  },
+  image: {
+    type: String,
+    required: false,
+  },
+  educationalBackground: EducationSchema,
+  socialMedia: [SocialMediaSchema],
+  portfolio: {
+    type: [String],
     required: false,
   },
   maritalStatus: {
@@ -86,26 +122,6 @@ const UserSchema = new mongoose.Schema({
     enum: ["superAdmin", "setAdmin", "member"],
     default: "member",
     required: true,
-  },
-  isSetExco: {
-    type: Boolean,
-    default: false,
-  },
-  isNationalExco: {
-    type: Boolean,
-    default: false,
-  },
-  setExcoOffice: {
-    type: String,
-    required: false,
-  },
-  isWhomWeAreProudOf: {
-    type: Boolean,
-    default: false,
-  },
-  summaryOfProfile: {
-    type: String,
-    required: false,
   },
   isVerified: {
     type: Boolean,
@@ -126,7 +142,9 @@ UserSchema.pre("save", async function () {
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);
 });
+
 UserSchema.methods.comparedPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
+
 module.exports = mongoose.model("User", UserSchema);
