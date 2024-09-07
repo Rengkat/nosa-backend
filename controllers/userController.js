@@ -53,7 +53,7 @@ const deleteUser = async (req, res) => {
 };
 const updateCurrentUser = async (req, res, next) => {
   try {
-    const { id } = req.user; 
+    const { id } = req.user;
     const { yearOfGraduation } = req.body;
 
     const user = await User.findById(id);
@@ -69,7 +69,6 @@ const updateCurrentUser = async (req, res, next) => {
       throw new CustomError.NotFoundError("NOSA Set not found");
     }
 
-  #
     user.set(req.body);
 
     // Set the user's nosaSet reference
@@ -80,7 +79,7 @@ const updateCurrentUser = async (req, res, next) => {
     // Add user to the NOSA Set's members array if not already added
     if (!nosaSet.members.includes(id)) {
       nosaSet.members.push(id);
-      await nosaSet.save(); 
+      await nosaSet.save();
     }
 
     res.status(StatusCodes.OK).json({

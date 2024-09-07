@@ -9,7 +9,6 @@ const addShowcase = async (req, res, next) => {
   try {
     const { image, title, caption } = req.body;
 
-    // Check if required fields are provided
     if (!image || !caption || !title) {
       throw new CustomError.BadRequestError("Please provide all details");
     }
@@ -31,9 +30,14 @@ const addShowcase = async (req, res, next) => {
 
 const getAllShowcase = async (req, res, next) => {
   try {
-    //add pagination
-    const showcases = await Showcase.find();
-    res.status(StatusCodes.OK).json(showcases);
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const totalUsers = await Showcase.countDocuments();
+
+    const showcases = await Showcase.find().skip(skip).limit(limit);
+    const totalPages = Math.ceil(totalUsers / limit);
+    res.status(StatusCodes.OK).json({ showcases, currentPage: page, limit, totalPages });
   } catch (error) {
     next(error);
   }
