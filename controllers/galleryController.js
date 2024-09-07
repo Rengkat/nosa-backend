@@ -7,14 +7,13 @@ const fs = require("node:fs");
 
 const addToGallery = async (req, res, next) => {
   try {
-    //add pagination
     const { images, title, caption, date } = req.body;
 
     if (!images || !images.length || !title || !date) {
       throw new CustomError.BadRequestError("Please provide all details");
     }
 
-    const gallery = await Gallery.create({
+    await Gallery.create({
       images,
       title,
       caption,
@@ -32,8 +31,17 @@ const addToGallery = async (req, res, next) => {
 
 const getAllGalleryImages = async (req, res, next) => {
   try {
-    const galleryImages = await Gallery.find();
-    res.status(StatusCodes.OK).json(galleryImages);
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const totalGallery = await Gallery.countDocuments();
+
+    const galleryImages = await Gallery.find().skip(skip).limit(limit);
+    const totalPages = Math.ceil(totalGallery / limit);
+    res
+      .status(StatusCodes.OK)
+      .json({ data: galleryImages, totalGallery, currentPage: page, limit, totalPages });
   } catch (error) {
     next(error);
   }

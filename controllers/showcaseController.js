@@ -33,11 +33,13 @@ const getAllShowcase = async (req, res, next) => {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    const totalUsers = await Showcase.countDocuments();
+    const totalShowcases = await Showcase.countDocuments();
 
     const showcases = await Showcase.find().skip(skip).limit(limit);
-    const totalPages = Math.ceil(totalUsers / limit);
-    res.status(StatusCodes.OK).json({ showcases, currentPage: page, limit, totalPages });
+    const totalPages = Math.ceil(totalShowcases / limit);
+    res
+      .status(StatusCodes.OK)
+      .json({ data: showcases, totalShowcases, currentPage: page, limit, totalPages });
   } catch (error) {
     next(error);
   }

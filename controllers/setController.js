@@ -23,11 +23,13 @@ const getAllSets = async (req, res, next) => {
     const limit = Number(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const totalUsers = await User.countDocuments();
+    const totalSets = await NosaSet.countDocuments();
 
     const sets = await NosaSet.find().skip(skip).limit(limit);
-    const totalPages = Math.ceil(totalUsers / limit);
-    res.status(StatusCodes.OK).json({ sets, totalUsers, totalPages, currentPage: page, limit });
+    const totalPages = Math.ceil(totalSets / limit);
+    res
+      .status(StatusCodes.OK)
+      .json({ data: sets, totalSets, totalPages, currentPage: page, limit });
   } catch (error) {
     next(error);
   }
