@@ -19,9 +19,15 @@ const createSet = async (req, res, next) => {
 
 const getAllSets = async (req, res, next) => {
   try {
-    //add pagination
-    const sets = await NosaSet.find();
-    res.status(StatusCodes.OK).json({ sets });
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const totalUsers = await User.countDocuments();
+
+    const sets = await NosaSet.find().skip(skip).limit(limit);
+    const totalPages = Math.ceil(totalUsers / limit);
+    res.status(StatusCodes.OK).json({ sets, totalUsers, totalPages, currentPage: page, limit });
   } catch (error) {
     next(error);
   }
