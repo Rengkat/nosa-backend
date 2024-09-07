@@ -8,10 +8,24 @@ const fs = require("node:fs");
 const { checkPermission } = require("../utils");
 const getAllUsers = async (req, res, next) => {
   try {
-    // Save the updated user
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
-    const users = await User.find({}).select("-password");
-    res.status(StatusCodes.OK).json({ success: true, users });
+    const totalUsers = await User.countDocuments();
+
+    const users = await User.find({}).select("-password").skip(skip).limit(limit);
+
+    const totalPages = Math.ceil(totalUsers / limit);
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      users,
+      totalUsers,
+      totalPages,
+      currentPage: page,
+      limit,
+    });
   } catch (error) {
     next(error);
   }
@@ -39,7 +53,7 @@ const deleteUser = async (req, res) => {
 };
 const updateCurrentUser = async (req, res, next) => {
   try {
-    const { id } = req.user; // Assuming req.user contains the authenticated user's ID
+    const { id } = req.user; 
     const { yearOfGraduation } = req.body;
 
     const user = await User.findById(id);
@@ -55,7 +69,7 @@ const updateCurrentUser = async (req, res, next) => {
       throw new CustomError.NotFoundError("NOSA Set not found");
     }
 
-    // Update user fields
+  #
     user.set(req.body);
 
     // Set the user's nosaSet reference
@@ -66,7 +80,7 @@ const updateCurrentUser = async (req, res, next) => {
     // Add user to the NOSA Set's members array if not already added
     if (!nosaSet.members.includes(id)) {
       nosaSet.members.push(id);
-      await nosaSet.save(); // Save the updated NOSA Set
+      await nosaSet.save(); 
     }
 
     res.status(StatusCodes.OK).json({
