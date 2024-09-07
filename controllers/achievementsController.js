@@ -5,10 +5,6 @@ const mongoose = require("mongoose");
 const cloudinary = require("cloudinary").v2;
 const fs = require("node:fs");
 
-const { StatusCodes } = require("http-status-codes");
-const Achievements = require("../models/Achievement");
-const CustomError = require("../errors");
-
 const createAchievementCategory = async (req, res, next) => {
   try {
     const { achievementName } = req.body;

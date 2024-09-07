@@ -7,7 +7,7 @@ const AchievementSchema = mongoose.Schema({
   },
   achievements: [
     {
-      type: Sting,
+      type: String,
       required: true,
     },
   ],
