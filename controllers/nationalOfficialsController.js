@@ -33,6 +33,7 @@ const addOfficial = async (req, res, next) => {
 
 const getAllOfficials = async (req, res, next) => {
   try {
+    //add pagination
     const nationalOfficials = await NationalOfficials.find({}).populate("user", "-password");
 
     res.status(StatusCodes.OK).json(nationalOfficials);

@@ -19,6 +19,7 @@ const createSet = async (req, res, next) => {
 
 const getAllSets = async (req, res, next) => {
   try {
+    //add pagination
     const sets = await NosaSet.find();
     res.status(StatusCodes.OK).json({ sets });
   } catch (error) {

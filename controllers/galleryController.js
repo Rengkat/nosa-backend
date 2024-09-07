@@ -5,18 +5,15 @@ const mongoose = require("mongoose");
 const cloudinary = require("cloudinary").v2;
 const fs = require("node:fs");
 
-const fs = require("fs");
-
 const addToGallery = async (req, res, next) => {
   try {
+    //add pagination
     const { images, title, caption, date } = req.body;
 
-    // Check if required fields are provided
     if (!images || !images.length || !title || !date) {
       throw new CustomError.BadRequestError("Please provide all details");
     }
 
-    // Create a new gallery entry
     const gallery = await Gallery.create({
       images,
       title,

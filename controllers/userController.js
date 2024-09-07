@@ -8,6 +8,8 @@ const fs = require("node:fs");
 const { checkPermission } = require("../utils");
 const getAllUsers = async (req, res, next) => {
   try {
+    // Save the updated user
+
     const users = await User.find({}).select("-password");
     res.status(StatusCodes.OK).json({ success: true, users });
   } catch (error) {
@@ -59,7 +61,6 @@ const updateCurrentUser = async (req, res, next) => {
     // Set the user's nosaSet reference
     user.nosaSet = nosaSet._id;
 
-    // Save the updated user
     await user.save();
 
     // Add user to the NOSA Set's members array if not already added

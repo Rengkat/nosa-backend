@@ -20,6 +20,10 @@ const userRoute = require("./route/userRoute");
 const nationalOfficialsRoute = require("./route/nationalOfficialsRoute");
 const setRoute = require("./route/setRoute");
 const galleryRoute = require("./route/galleryRoute");
+const newsAndBlogRoute = require("./route/newsAndBlogRoute");
+const showcaseRoute = require("./route/showcaseRoute");
+const achievementRoute = require("./route/achievementRoute");
+
 //middlewares importations
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
@@ -48,6 +52,10 @@ app.use("/api/users", userRoute);
 app.use("/api/national-officials", nationalOfficialsRoute);
 app.use("/api/nosa-sets", setRoute);
 app.use("/api/gallery", galleryRoute);
+app.use("/api/news-and-blogs", newsAndBlogRoute);
+app.use("/api/showcase", showcaseRoute);
+app.use("/api/achievements", achievementRoute);
+
 //errors initialization
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);

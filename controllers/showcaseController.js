@@ -1,29 +1,27 @@
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
-const NewsAndBlog = require("../model/newsAndBlogModel");
+const Showcase = require("../model/showcaseModel");
 const mongoose = require("mongoose");
 const cloudinary = require("cloudinary").v2;
 const fs = require("node:fs");
 
-const addNewsAndBlog = async (req, res, next) => {
+const addShowcase = async (req, res, next) => {
   try {
-    const { image, title, content, category, user } = req.body;
+    const { image, title, caption } = req.body;
 
     // Check if required fields are provided
-    if (!image || !content || !title || !category || user) {
+    if (!image || !caption || !title) {
       throw new CustomError.BadRequestError("Please provide all details");
     }
 
-    await NewsAndBlog.create({
+    await Showcase.create({
       image,
       title,
-      content,
-      category,
-      user,
+      caption,
     });
 
     res.status(StatusCodes.CREATED).json({
-      message: `A(an) ${category} has been published`,
+      message: "Showcase added successfully",
       success: true,
     });
   } catch (error) {
@@ -31,51 +29,51 @@ const addNewsAndBlog = async (req, res, next) => {
   }
 };
 
-const getAllNewsAndBlogs = async (req, res, next) => {
+const getAllShowcase = async (req, res, next) => {
   try {
     //add pagination
-    const newsAndBlogs = await NewsAndBlog.find();
-    res.status(StatusCodes.OK).json(newsAndBlogs);
+    const showcases = await Showcase.find();
+    res.status(StatusCodes.OK).json(showcases);
   } catch (error) {
     next(error);
   }
 };
-const getSingleNewsOrBlog = async (req, res, next) => {
+const getSingleShowcase = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new CustomError.BadRequestError("Invalid ID format");
     }
-    const singleArticle = await NewsAndBlog.findById(id).populate("user", "-password");
-    if (!singleArticle) {
-      throw new CustomError.NotFoundError("Article not found");
+    const singleShowcase = await Showcase.findById(id);
+    if (!singleShowcase) {
+      throw new CustomError.NotFoundError("Showcase not found");
     }
-    res.status(StatusCodes.OK).json(singleArticle);
+    res.status(StatusCodes.OK).json(singleShowcase);
   } catch (error) {
     next(error);
   }
 };
-const updateNewsOrBlog = async (req, res, next) => {
+const updateShowcase = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { image, title, content, category, user } = req.body;
+    const { images, title, caption } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new CustomError.BadRequestError("Invalid ID format");
     }
 
-    const updatedNewsOrBlog = await NewsAndBlog.findByIdAndUpdate(
+    const updatedShowcase = await Showcase.findByIdAndUpdate(
       id,
-      { image, title, content, category, user },
+      { images, title, caption },
       { new: true, runValidators: true }
     );
 
-    if (!updatedNewsOrBlog) {
-      throw new CustomError.NotFoundError("Resources not found");
+    if (!updatedShowcase) {
+      throw new CustomError.NotFoundError("Showcase not found");
     }
 
     res.status(StatusCodes.OK).json({
-      message: `${updatedNewsOrBlog.category} updated successfully`,
+      message: "Showcase updated successfully",
       success: true,
     });
   } catch (error) {
@@ -83,25 +81,23 @@ const updateNewsOrBlog = async (req, res, next) => {
   }
 };
 
-const removeNewsOrBlog = async (req, res, next) => {
+const deleteShowcase = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new CustomError.BadRequestError("Invalid ID format");
     }
-    const singleNewsOrBlog = await NewsAndBlog.findByIdAndDelete(id);
-    if (!singleNewsOrBlog) {
-      throw new CustomError.NotFoundError("Result not found");
+    const showcase = await Showcase.findByIdAndDelete(id);
+    if (!showcase) {
+      throw new CustomError.NotFoundError("Showcase not found");
     }
-    res
-      .status(StatusCodes.OK)
-      .json({ message: `${singleNewsOrBlog.category} deleted successfully`, success: true });
+    res.status(StatusCodes.OK).json({ message: "Showcase deleted successfully", success: true });
   } catch (error) {
     next(error);
   }
 };
 
-const uploadNewsOrBlogImage = async (req, res, next) => {
+const uploadImage = async (req, res, next) => {
   try {
     if (!req.files || !req.files.image) {
       return res
@@ -118,7 +114,7 @@ const uploadNewsOrBlogImage = async (req, res, next) => {
 
     const result = await cloudinary.uploader.upload(req.files.image.tempFilePath, {
       use_filename: true,
-      folder: process.env.CLOUDINARY_NEWS_AND_BLOG_FOLDER_NAME,
+      folder: process.env.CLOUDINARY_SHOWCASE_FOLDER_NAME,
     });
 
     fs.unlinkSync(req.files.image.tempFilePath);
@@ -130,10 +126,10 @@ const uploadNewsOrBlogImage = async (req, res, next) => {
 };
 
 module.exports = {
-  addNewsAndBlog,
-  updateNewsOrBlog,
-  removeNewsOrBlog,
-  getAllNewsAndBlogs,
-  getSingleNewsOrBlog,
-  uploadNewsOrBlogImage,
+  addShowcase,
+  updateShowcase,
+  deleteShowcase,
+  getAllShowcase,
+  getSingleShowcase,
+  uploadImage,
 };
