@@ -23,7 +23,7 @@ const galleryRoute = require("./route/galleryRoute");
 const newsAndBlogRoute = require("./route/newsAndBlogRoute");
 const showcaseRoute = require("./route/showcaseRoute");
 const achievementRoute = require("./route/achievementRoute");
-
+const statsRoute = require("../route/statsRoute");
 //middlewares importations
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
@@ -55,6 +55,7 @@ app.use("/api/gallery", galleryRoute);
 app.use("/api/news-and-blogs", newsAndBlogRoute);
 app.use("/api/showcase", showcaseRoute);
 app.use("/api/achievements", achievementRoute);
+app.use("/api/stats", statsRoute);
 
 //errors initialization
 app.use(notFoundMiddleware);
