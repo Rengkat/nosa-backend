@@ -1,6 +1,6 @@
 const express = require("express");
 const {
-  getAllUsers,
+  getAllVerifiedUsers,
   getSingleUser,
   deleteUser,
   updateCurrentUser,
@@ -14,7 +14,7 @@ const {
 } = require("../middleware/authentication");
 
 const router = express.Router();
-router.get("/", getAllUsers);
+router.get("/", getAllVerifiedUsers);
 router.route("/uploadUserImage").post(authenticateUser, uploadUserImage);
 router.put("/updateCurrentUser", authenticateUser, updateCurrentUser);
 router

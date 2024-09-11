@@ -6,5 +6,5 @@ const {
 } = require("../middleware/authentication");
 
 const router = express.Router();
-router.get("/events", getAllEvents);
+router.get("/", getAllEvents);
 module.exports = router;
