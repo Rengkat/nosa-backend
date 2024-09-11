@@ -35,11 +35,24 @@ const getAllSets = async (req, res, next) => {
   }
 };
 
-const getSetMembers = async (req, res, next) => {
+const getSetVerifiedMembers = async (req, res, next) => {
   try {
     const { set } = req.params;
-    const members = await User.find({ yearOfGraduation: set }).select("-password");
-    res.status(StatusCodes.OK).json({ members });
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const totalSetMembers = await User.countDocuments({ yearOfGraduation: set, isVerified: true });
+
+    const members = await User.find({ yearOfGraduation: set, isVerified: true })
+      .select("-password")
+      .skip(skip)
+      .limit(limit);
+    const totalPages = Math.ceil(totalSetMembers / limit);
+
+    res
+      .status(StatusCodes.OK)
+      .json({ data: members, totalSetMembers, totalPages, currentPage: page, limit });
   } catch (error) {
     next(error);
   }
@@ -53,4 +66,4 @@ const getSetAdmins = async (req, res, next) => {
     res.status(StatusCodes.OK).json({ setAdmin });
   } catch (error) {}
 };
-module.exports = { createSet, getAllSets, getSetAdmins, getSetMembers };
+module.exports = { createSet, getAllSets, getSetAdmins, getSetVerifiedMembers };

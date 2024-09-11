@@ -3,7 +3,7 @@ const {
   createSet,
   getAllSets,
   getSetAdmins,
-  getSetMembers,
+  getSetVerifiedMembers,
 } = require("../controllers/setController");
 const {
   authenticateUser,
@@ -26,6 +26,6 @@ router
   );
 
 // Route to get all members of a specific NOSA set
-router.route("/:set/members").get(authenticateUser, getSetMembers);
+router.route("/:set/members").get(authenticateUser, getSetVerifiedMembers);
 
 module.exports = router;
