@@ -57,6 +57,19 @@ const getSetVerifiedMembers = async (req, res, next) => {
     next(error);
   }
 };
+const getSetUnVerifiedMembers = async (req, res, next) => {
+  try {
+    const totalSetMembers = await User.countDocuments({ yearOfGraduation: set, isVerified: false });
+
+    const members = await User.find({ yearOfGraduation: set, isVerified: false }).select(
+      "-password"
+    );
+
+    res.status(StatusCodes.OK).json({ data: members, totalUnverifiedSetMembers });
+  } catch (error) {
+    next(error);
+  }
+};
 
 const getSetAdmins = async (req, res, next) => {
   try {
@@ -66,4 +79,10 @@ const getSetAdmins = async (req, res, next) => {
     res.status(StatusCodes.OK).json({ setAdmin });
   } catch (error) {}
 };
-module.exports = { createSet, getAllSets, getSetAdmins, getSetVerifiedMembers };
+module.exports = {
+  createSet,
+  getAllSets,
+  getSetAdmins,
+  getSetVerifiedMembers,
+  getSetUnVerifiedMembers,
+};
