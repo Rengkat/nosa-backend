@@ -1,10 +1,10 @@
 const express = require("express");
-const getStats = require("../controllers/statsController");
+const { getAllEvents } = require("../controllers/newsAndBlogController");
 const {
   authenticateUser,
   superAdminAuthorizationPermission,
-  superAdminAndSetAdminAuthorizationPermission,
 } = require("../middleware/authentication");
+
 const router = express.Router();
-router.get("/", authenticateUser, getStats);
+router.get("/events", getAllEvents);
 module.exports = router;

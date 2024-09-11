@@ -6,6 +6,8 @@ const {
   getAllNewsAndBlogs,
   getSingleNewsOrBlog,
   uploadNewsOrBlogImage,
+  getAllBlogs,
+  getAllNews,
 } = require("../controllers/newsAndBlogController");
 const {
   authenticateUser,
@@ -17,6 +19,8 @@ router
   .route("/")
   .post([authenticateUser, superAdminAuthorizationPermission], addNewsAndBlog)
   .get(getAllNewsAndBlogs);
+router.get("/news", getAllNews);
+router.get("/blogs", getAllBlogs);
 router.post(
   "/uploadImage",
   [authenticateUser, superAdminAuthorizationPermission],

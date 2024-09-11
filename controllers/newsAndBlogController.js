@@ -49,6 +49,30 @@ const getAllNewsAndBlogs = async (req, res, next) => {
     next(error);
   }
 };
+const getAllEvents = async (req, res, next) => {
+  try {
+    const events = await BlogsAndNews.find({ category: "event" });
+    res.status(StatusCodes.OK).json({ data: events });
+  } catch (error) {
+    next(error);
+  }
+};
+const getAllNews = async (req, res, next) => {
+  try {
+    const news = await BlogsAndNews.find({ category: "news" });
+    res.status(StatusCodes.OK).json({ data: news });
+  } catch (error) {
+    next(error);
+  }
+};
+const getAllBlogs = async (req, res, next) => {
+  try {
+    const blogs = await BlogsAndNews.find({ category: "blog" });
+    res.status(StatusCodes.OK).json({ data: blogs });
+  } catch (error) {
+    next(error);
+  }
+};
 const getSingleNewsOrBlog = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -145,4 +169,7 @@ module.exports = {
   getAllNewsAndBlogs,
   getSingleNewsOrBlog,
   uploadNewsOrBlogImage,
+  getAllEvents,
+  getAllBlogs,
+  getAllNews,
 };
