@@ -51,7 +51,7 @@ const getAllNewsAndBlogs = async (req, res, next) => {
 };
 const getAllEvents = async (req, res, next) => {
   try {
-    const events = await BlogsAndNews.find({ category: "event" });
+    const events = await NewsAndBlog.find({ category: "event" });
     res.status(StatusCodes.OK).json({ data: events });
   } catch (error) {
     next(error);
@@ -59,7 +59,7 @@ const getAllEvents = async (req, res, next) => {
 };
 const getAllNews = async (req, res, next) => {
   try {
-    const news = await BlogsAndNews.find({ category: "news" });
+    const news = await NewsAndBlog.find({ category: "news" });
     res.status(StatusCodes.OK).json({ data: news });
   } catch (error) {
     next(error);
@@ -67,7 +67,7 @@ const getAllNews = async (req, res, next) => {
 };
 const getAllBlogs = async (req, res, next) => {
   try {
-    const blogs = await BlogsAndNews.find({ category: "blog" });
+    const blogs = await NewsAndBlog.find({ category: "blog" });
     res.status(StatusCodes.OK).json({ data: blogs });
   } catch (error) {
     next(error);

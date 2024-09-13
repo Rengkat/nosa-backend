@@ -28,6 +28,6 @@ router
 
 // Route to get all members of a specific NOSA set
 router.route("/:set/members").get(authenticateUser, getSetVerifiedMembers);
-router.route("/:set/Unverified-members").get(authenticateUser, getSetUnVerifiedMembers);
+router.route("/:set/unverified-members").get(authenticateUser, getSetUnVerifiedMembers);
 
 module.exports = router;

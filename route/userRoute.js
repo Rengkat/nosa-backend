@@ -6,6 +6,8 @@ const {
   updateCurrentUser,
   updateUser,
   uploadUserImage,
+  verifyUser,
+  getAllUnverifiedUsers,
 } = require("../controllers/userController");
 const {
   authenticateUser,
@@ -15,8 +17,20 @@ const {
 
 const router = express.Router();
 router.get("/", getAllVerifiedUsers);
+router.get(
+  "/unverified-users",
+  authenticateUser,
+  superAdminAuthorizationPermission,
+  getAllUnverifiedUsers
+);
 router.route("/uploadUserImage").post(authenticateUser, uploadUserImage);
 router.put("/updateCurrentUser", authenticateUser, updateCurrentUser);
+router.patch(
+  "/verify",
+  authenticateUser,
+  superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin"),
+  verifyUser
+);
 router
   .route("/:userId")
   .get(getSingleUser)
