@@ -16,6 +16,16 @@ const router = express.Router();
 router
   .route("/")
   .post([authenticateUser, superAdminAuthorizationPermission], addOfficial)
-  .get([authenticateUser, superAdminAuthorizationPermission], getAllOfficials);
-
+  .get(getAllOfficials);
+router.put(
+  "/update-official",
+  [authenticateUser, superAdminAuthorizationPermission],
+  updateOfficialPost
+);
+router.delete(
+  "/delete-official",
+  [authenticateUser, superAdminAuthorizationPermission],
+  deleteOfficial
+);
+router.get("/:officeId", getSingleOfficial);
 module.exports = router;

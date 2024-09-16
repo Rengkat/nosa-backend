@@ -60,7 +60,7 @@ const UserSchema = new mongoose.Schema(
       },
     },
     phone: {
-      type: String,
+      type: String, //will be unique when everything is done
     },
     password: {
       type: String,
@@ -136,7 +136,7 @@ const UserSchema = new mongoose.Schema(
     },
     firstVisit: {
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }

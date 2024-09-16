@@ -13,7 +13,7 @@ const getAllVerifiedUsers = async (req, res, next) => {
     const limit = Number(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    let query = { isVerified: true };
+    let query = { isVerified: true, firstVisit: false };
 
     if (name) {
       query.$or = [
@@ -47,7 +47,7 @@ const getAllUnverifiedUsers = async (req, res, next) => {
     const limit = Number(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    let query = { isVerified: false };
+    let query = { isVerified: false, firstVisit: false };
 
     if (name) {
       query.$or = [
@@ -118,8 +118,8 @@ const updateCurrentUser = async (req, res, next) => {
 
     user.nosaSet = nosaSet._id;
 
-    if (!user.firstVisit) {
-      user.firstVisit = true;
+    if (user.firstVisit) {
+      user.firstVisit = false;
     }
 
     await user.save();
