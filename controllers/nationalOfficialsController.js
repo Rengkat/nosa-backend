@@ -43,7 +43,7 @@ const getAllOfficials = async (req, res, next) => {
     const totalOfficials = await NationalOfficials.countDocuments();
 
     const nationalOfficials = await NationalOfficials.find({})
-      .populate("user", "-password")
+      .populate("user", "firstName surname yearOfGraduation socialMedia -_id")
       .skip(skip)
       .limit(limit);
 
@@ -65,7 +65,7 @@ const getSingleOfficial = async (req, res, next) => {
       throw new CustomError.BadRequestError("user ID is required");
     }
 
-    const office = await NationalOfficials.findById(officeId).populate("user");
+    const office = await NationalOfficials.findById(officeId).populate("user", "-password");
 
     if (!office) {
       throw new CustomError.NotFoundError("User not found");
@@ -126,13 +126,11 @@ const deleteOfficial = async (req, res, next) => {
       throw new CustomError.BadRequestError("Please provide user id");
     }
 
-    // Find the official by user ID
     const official = await NationalOfficials.findOne({ user: userId });
     if (!official) {
       throw new CustomError.NotFoundError("Official not found");
     }
 
-    // Remove the official
     await NationalOfficials.findOneAndDelete({ user: userId });
 
     // Set the user's `isNationalExco` to false
