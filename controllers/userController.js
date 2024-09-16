@@ -104,8 +104,9 @@ const updateCurrentUser = async (req, res, next) => {
     if (!user) {
       throw new CustomError.NotFoundError("User not found");
     }
+
     if (!yearOfGraduation) {
-      throw new CustomError.NotFoundError("Provide all details");
+      throw new CustomError.BadRequestError("Provide all details");
     }
 
     const nosaSet = await NosaSet.findOne({ name: yearOfGraduation });
@@ -115,12 +116,14 @@ const updateCurrentUser = async (req, res, next) => {
 
     user.set(req.body);
 
-    // Set the user's nosaSet reference
     user.nosaSet = nosaSet._id;
+
+    if (!user.firstVisit) {
+      user.firstVisit = true;
+    }
 
     await user.save();
 
-    // Add user to the NOSA Set's members array if not already added
     if (!nosaSet.members.includes(id)) {
       nosaSet.members.push(id);
       await nosaSet.save();
@@ -128,12 +131,13 @@ const updateCurrentUser = async (req, res, next) => {
 
     res.status(StatusCodes.OK).json({
       success: true,
-      message: "Your credentials were successfully updated",
+      message: "Your profile has been successfully updated",
     });
   } catch (error) {
     next(error);
   }
 };
+
 const verifyUser = async (req, res, next) => {
   try {
     const userId = req.body.id || req.params.id;

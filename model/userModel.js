@@ -134,6 +134,10 @@ const UserSchema = new mongoose.Schema(
       default: "active",
       required: true,
     },
+    firstVisit: {
+      type: Boolean,
+      default: false,
+    },
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
