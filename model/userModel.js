@@ -138,6 +138,12 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    isSetAdminVerify: {
+      type: Boolean,
+      default: true,
+    },
+    emailVerificationToken: { type: String },
+    emailVerificationTokenExpirationDate: { type: Date },
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );

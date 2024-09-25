@@ -13,7 +13,7 @@ const getAllVerifiedUsers = async (req, res, next) => {
     const limit = Number(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    let query = { isVerified: true, firstVisit: false };
+    let query = { isSetAdminVerify: true, firstVisit: false };
 
     if (name) {
       query.$or = [
@@ -47,7 +47,7 @@ const getAllUnverifiedUsers = async (req, res, next) => {
     const limit = Number(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    let query = { isVerified: false, firstVisit: false };
+    let query = { isSetAdminVerify: false, firstVisit: false };
 
     if (name) {
       query.$or = [
@@ -159,7 +159,7 @@ const verifyUser = async (req, res, next) => {
       });
     }
 
-    user.isVerified = true;
+    user.isSetAdminVerify = true;
     await user.save();
 
     res.status(StatusCodes.OK).json({
