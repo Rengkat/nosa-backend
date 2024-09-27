@@ -1,8 +1,8 @@
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
 const User = require("../model/userModel");
-const { attachTokenToResponse, createUserPayload } = require("../utils");
-
+const { attachTokenToResponse, createUserPayload, sendVerificationEmail } = require("../utils");
+const crypto = require("crypto");
 const register = async (req, res, next) => {
   const { firstName, surname, email, password } = req.body;
   try {
@@ -17,41 +17,71 @@ const register = async (req, res, next) => {
 
     const userCount = await User.countDocuments();
     const assignedRole = userCount === 0 ? "superAdmin" : "member";
+    //CREATE TOKEN
+    const oneHour = 1000 * 60 * 60;
+    const emailVerificationToken = crypto.randomBytes(40).toString("hex");
+    const emailVerificationTokenExpirationDate = new Date(Date.now() + oneHour);
+    const user = await User.create({
+      firstName,
+      surname,
+      email,
+      password,
+      role: assignedRole,
+      emailVerificationToken,
+      emailVerificationTokenExpirationDate,
+    });
 
-    await User.create({ firstName, surname, email, password, role: assignedRole });
     //send verification code
-    res.status(StatusCodes.CREATED).json({ message: "Registration successful", success: true });
+    await sendVerificationEmail({
+      firstName: user.firstName,
+      email: user.email,
+      verificationToken: user.emailVerificationToken,
+      origin: process.env.ORIGIN,
+    });
+    res.status(StatusCodes.CREATED).json({
+      message: "Registration successful. Please check your email and verify it",
+      success: true,
+    });
   } catch (error) {
     next(error);
   }
 };
-//verify email
+
 const verifyEmail = async (req, res, next) => {
   try {
     const { email, verificationToken } = req.body;
+
     if (!email || !verificationToken) {
       throw new CustomError.BadRequestError("Please provide all credentials");
     }
+
+    // Find the user by email
     const user = await User.findOne({ email });
     if (!user) {
       throw new CustomError.NotFoundError("User not found");
     }
-    // check if the verification expire
+
+    // Check if verification token has expired
     const currentDate = new Date();
-    if (currentDate > user?.emailVerificationTokenExpirationDate) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        success: false,
-        message: "Verification fail. Please request a new token.",
-      });
+    if (currentDate > user.emailVerificationTokenExpirationDate) {
+      throw new CustomError.BadRequestError("Verification failed. Please request a new token.");
     }
-    // then check is the verification token is same
-    if (user?.emailVerificationToken !== verificationToken) {
+
+    // Timing-safe token comparison
+    const isTokenValid = crypto.timingSafeEqual(
+      Buffer.from(user.emailVerificationToken),
+      Buffer.from(verificationToken)
+    );
+
+    if (!isTokenValid) {
       throw new CustomError.BadRequestError("Verification failed");
     }
+
     user.isVerified = true;
-    user.verificationToken = null;
+    user.emailVerificationToken = null;
     user.emailVerificationTokenExpirationDate = null;
     await user.save();
+
     res.status(StatusCodes.OK).json({
       success: true,
       message: "Email successfully verified",
@@ -60,6 +90,7 @@ const verifyEmail = async (req, res, next) => {
     next(error);
   }
 };
+
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;

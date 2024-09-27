@@ -4,14 +4,14 @@ const nodemailerConfig = require("./nodemailerConfig");
 const sendEmail = async ({ to, subject, html }) => {
   const transporter = nodemailer.createTransport(nodemailerConfig);
 
-  const info = await transporter.sendMail({
+  await transporter.sendMail({
     from: `"NOSA" <${process.env.GMAIL_ADDRESS}>`,
     to,
     subject,
     html,
   });
 
-  console.log("Message sent: %s", info.messageId);
+  console.log("Message sent");
 };
 
 module.exports = sendEmail;

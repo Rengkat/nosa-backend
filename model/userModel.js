@@ -140,7 +140,7 @@ const UserSchema = new mongoose.Schema(
     },
     isSetAdminVerify: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     emailVerificationToken: { type: String },
     emailVerificationTokenExpirationDate: { type: Date },
