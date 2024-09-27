@@ -110,7 +110,14 @@ const login = async (req, res, next) => {
       throw new CustomError.UnauthenticatedError("Please verify your email");
     }
     //refresh token
+    let refreshToken = "";
     const userPayload = createUserPayload(user);
+
+    refreshToken = crypto.randomBytes(40).toString("hex");
+    const ip = req.ip;
+    const userAgent = req.headers["user-agent"];
+    //create token model and create a refresh token payload
+
     const token = attachTokenToResponse({ res, userPayload });
     res.status(StatusCodes.OK).json({
       message: "login successfully",
