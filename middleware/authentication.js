@@ -1,30 +1,46 @@
 const CustomError = require("../errors");
-const { isTokenVerified } = require("../utils");
-const User = require("../model/userModel");
+const { isTokenVerified, attachTokenToResponse } = require("../utils");
+const Token = require("../model/Token");
+
 const authenticateUser = async (req, res, next) => {
   try {
-    let token;
+    let accessToken;
+    let refreshToken;
 
     if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-      token = req.headers.authorization.split(" ")[1];
+      accessToken = req.headers.authorization.split(" ")[1];
     } else if (req.signedCookies.token) {
-      token = req.signedCookies.token;
+      accessToken = req.signedCookies.accessToken;
     }
-
-    if (!token) {
+    // If no access token, check for refresh token in cookies
+    if (!accessToken && req.signedCookies.refreshToken) {
+      refreshToken = req.signedCookies.refreshToken;
+    }
+    if (!accessToken && !refreshToken) {
       throw new CustomError.UnauthenticatedError("Authentication invalid - No token provided");
     }
 
-    const user = isTokenVerified({ token });
-
-    if (!user) {
-      throw new CustomError.UnauthenticatedError(
-        "Authentication invalid - Token verification failed"
-      );
+    if (accessToken) {
+      const payload = isTokenVerified(accessToken);
+      req.user = payload.accessToken;
+      return next();
     }
-    // Attach the user to the request object
-    const { firstName, surname, id, role } = user;
-    req.user = { firstName, surname, id, role };
+    //handle refresh token
+    const payload = isTokenVerified(refreshToken);
+
+    const existingRefreshToken = await Token.findOne({
+      user: payload.accessToken.id,
+      refreshToken: payload.refreshToken,
+    });
+    if (!existingRefreshToken || !existingRefreshToken?.isValid) {
+      throw new CustomError.UnauthenticatedError("Authentication invalid");
+    }
+    attachTokenToResponse({
+      res,
+      userPayload: payload.accessToken,
+      refreshToken: existingRefreshToken.refreshToken,
+    });
+    req.user = payload.accessToken;
 
     next();
   } catch (error) {
