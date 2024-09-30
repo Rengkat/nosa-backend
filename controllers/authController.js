@@ -147,7 +147,6 @@ const login = async (req, res, next) => {
   }
 };
 const logout = async (req, res, next) => {
-  //remove Token
   try {
     const userId = req.user.id;
     await Token.findOneAndDelete({ user: userId });
