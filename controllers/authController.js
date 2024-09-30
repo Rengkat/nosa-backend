@@ -158,8 +158,5 @@ const logout = async (req, res, next) => {
     next(error);
   }
 };
-//forgot password
-const forgotPassword = async (req, res) => {};
-//reset password
-const resetPassword = async (req, res) => {};
-module.exports = { register, verifyEmail, login, logout, forgotPassword, resetPassword };
+
+module.exports = { register, verifyEmail, login, logout };

@@ -10,7 +10,7 @@ const attachTokenToResponse = ({ res, userPayload, refreshToken }) => {
   const expiringDate = 1000 * 60 * 60 * 24 * 30; // 30 days
   res.cookie("accessToken", accessTokenJWT, {
     httpOnly: true,
-    maxAge: 1000 * 10,
+    maxAge: 1000 * 60 * 5,
     signed: true, // app is using cookie-parser with a secret
     secure: false, // False for development (local)
   });

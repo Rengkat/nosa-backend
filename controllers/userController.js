@@ -6,6 +6,8 @@ const path = require("node:path");
 const cloudinary = require("cloudinary").v2;
 const fs = require("node:fs");
 const { checkPermission } = require("../utils");
+const crypto = require("crypto");
+const sendResetPasswordEmail = require("../utils/Email/sendResetPasswordEmail");
 const getAllVerifiedUsers = async (req, res, next) => {
   try {
     const { name } = req.query;
@@ -221,6 +223,82 @@ const uploadUserImage = async (req, res, next) => {
     next(error);
   }
 };
+//forgot password
+const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      throw new CustomError.BadRequestError("Please provide email");
+    }
+
+    const user = await User.findOne({ email });
+
+    const oneHour = 1000 * 60 * 60;
+    const verificationToken = crypto.randomBytes(70).toString("hex");
+    const verificationTokenExpirationDate = new Date(Date.now() + oneHour);
+
+    if (user) {
+      user.emailVerificationToken = verificationToken;
+      user.emailVerificationTokenExpirationDate = verificationTokenExpirationDate;
+      await user.save();
+
+      await sendResetPasswordEmail({
+        origin: process.env.ORIGIN,
+        firstName: user.firstName,
+        email: user.email,
+        token: user.emailVerificationToken,
+      });
+    }
+
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "Please check your email to set your password", success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
+//reset password
+const resetPassword = async (req, res, next) => {
+  try {
+    const { email, verificationToken, password } = req.body;
+    if (!email || !verificationToken || !password) {
+      throw new CustomError.BadRequestError("Please provide all credentials");
+    }
+
+    // Find the user by email
+    const user = await User.findOne({ email });
+    if (user) {
+      const currentDate = new Date();
+
+      // Use timing-safe comparison for token validation
+      const userTokenBuffer = Buffer.from(user.emailVerificationToken || "");
+      const providedTokenBuffer = Buffer.from(verificationToken);
+
+      if (
+        userTokenBuffer.length !== providedTokenBuffer.length ||
+        !crypto.timingSafeEqual(userTokenBuffer, providedTokenBuffer)
+      ) {
+        throw new CustomError.BadRequestError("Verification failed");
+      }
+
+      if (currentDate > user.emailVerificationTokenExpirationDate) {
+        throw new CustomError.BadRequestError("Verification code expired. Please reverify");
+      }
+
+      user.password = password;
+      user.emailVerificationToken = null;
+      user.emailVerificationTokenExpirationDate = null;
+
+      await user.save();
+    }
+
+    res.status(StatusCodes.OK).json({ message: "Password successfully reset", success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getAllVerifiedUsers,
   getSingleUser,
@@ -230,4 +308,6 @@ module.exports = {
   verifyUser,
   uploadUserImage,
   getAllUnverifiedUsers,
+  forgotPassword,
+  resetPassword,
 };

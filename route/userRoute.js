@@ -8,6 +8,8 @@ const {
   uploadUserImage,
   verifyUser,
   getAllUnverifiedUsers,
+  forgotPassword,
+  resetPassword,
 } = require("../controllers/userController");
 const {
   authenticateUser,
@@ -26,11 +28,13 @@ router.get(
 router.route("/uploadUserImage").post(authenticateUser, uploadUserImage);
 router.put("/updateCurrentUser", authenticateUser, updateCurrentUser);
 router.patch(
-  "/verify",
+  "/verify-by-setAdmin",
   authenticateUser,
   superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin"),
   verifyUser
 );
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 router
   .route("/:userId")
   .get(getSingleUser)
