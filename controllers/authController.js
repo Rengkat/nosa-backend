@@ -104,7 +104,7 @@ const login = async (req, res, next) => {
     }
     const isPasswordMatched = await user.comparedPassword(password);
     if (!isPasswordMatched) {
-      throw new CustomError.BadRequest("Please enter valid credentials");
+      throw new CustomError.BadRequestError("Please enter valid credentials");
     }
     //check if user is verified
     if (!user.isVerified) {
