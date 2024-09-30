@@ -16,6 +16,7 @@ const connectDB = require("./db/connectDB");
 
 //routes importations
 const authRoute = require("./route/authRoute");
+const adminAuthRoute = require("./route/adminAuthRouter");
 const userRoute = require("./route/userRoute");
 const nationalOfficialsRoute = require("./route/nationalOfficialsRoute");
 const setRoute = require("./route/setRoute");
@@ -49,6 +50,7 @@ app.use(
 
 //route initialization
 app.use("/api/auth", authRoute);
+app.use("/api/admin-auth", adminAuthRoute);
 app.use("/api/users", userRoute);
 app.use("/api/national-officials", nationalOfficialsRoute);
 app.use("/api/nosa-sets", setRoute);

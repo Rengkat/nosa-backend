@@ -125,7 +125,7 @@ const login = async (req, res, next) => {
         message: "login successfully",
         user: userPayload,
         success: true,
-        token,
+        token: token.accessTokenJWT,
       });
     }
     refreshToken = crypto.randomBytes(40).toString("hex");
@@ -140,7 +140,7 @@ const login = async (req, res, next) => {
       message: "login successfully",
       user: userPayload,
       success: true,
-      token,
+      token: token.accessTokenJWT,
     });
   } catch (error) {
     next(error);

@@ -1,7 +1,10 @@
 const User = require("../model/userModel");
 const Token = require("../model/Token");
 const CustomError = require("../errors");
-const { model } = require("mongoose");
+const { createUserPayload, attachTokenToResponse } = require("../utils");
+const crypto = require("crypto");
+const { StatusCodes } = require("http-status-codes");
+
 const loginAdmin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -43,7 +46,7 @@ const loginAdmin = async (req, res, next) => {
         message: "Admin login successful",
         user: userPayload,
         success: true,
-        token,
+        token: token.accessTokenJWT,
       });
     }
 
@@ -59,7 +62,7 @@ const loginAdmin = async (req, res, next) => {
       message: "Admin login successful",
       user: userPayload,
       success: true,
-      token,
+      token: token.accessTokenJWT,
     });
   } catch (error) {
     next(error);
@@ -81,4 +84,4 @@ const logoutAdmin = async (req, res, next) => {
     next(error);
   }
 };
-model.exports = { loginAdmin, logoutAdmin };
+module.exports = { loginAdmin, logoutAdmin };

@@ -13,3 +13,4 @@ router.post(
   superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin"),
   logoutAdmin
 );
+module.exports = router;
