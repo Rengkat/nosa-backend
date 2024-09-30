@@ -110,7 +110,7 @@ const UserSchema = new mongoose.Schema(
     educationalBackground: EducationSchema,
     socialMedia: [SocialMediaSchema],
     portfolio: {
-      type: [String],
+      type: String,
       required: false,
     },
     maritalStatus: {
