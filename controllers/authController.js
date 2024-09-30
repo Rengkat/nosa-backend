@@ -149,7 +149,13 @@ const login = async (req, res, next) => {
 const logout = async (req, res, next) => {
   //remove Token
   try {
-    res.cookie("token", "", {
+    const userId = req.user.id;
+    await Token.findOneAndDelete({ user: userId });
+    res.cookie("accessToken", "", {
+      httpOnly: true,
+      expires: new Date(0),
+    });
+    res.cookie("refreshToken", "", {
       httpOnly: true,
       expires: new Date(0),
     });
