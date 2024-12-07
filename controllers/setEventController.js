@@ -44,7 +44,18 @@ const getAllSetEvent = async (req, res, next) => {
     next(error);
   }
 };
-const getSingleSetEvent = async (req, res, next) => {};
+const getSingleSetEvent = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      throw new CustomError.BadRequestError("Please provide id");
+    }
+    const event = await SetEvent.findById(id);
+    res.status(StatusCodes.OK).json({ event });
+  } catch (error) {
+    next(error);
+  }
+};
 const updateSetEvent = async (req, res, next) => {};
 const deleteSetEvent = async (req, res, next) => {};
 module.exports = {
