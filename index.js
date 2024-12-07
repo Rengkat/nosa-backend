@@ -78,3 +78,5 @@ const start = async () => {
 start();
 // 7091385034; wema data site
 // 08079353851
+
+// mongodb+srv://nosaAdmin:NosaAdmin12345@nosa-web.ocqb8.mongodb.net/NOSA

@@ -18,29 +18,6 @@ const SocialMediaSchema = new mongoose.Schema({
   },
 });
 
-const EducationSchema = new mongoose.Schema({
-  primaryEducation: {
-    type: String,
-    required: false,
-  },
-  secondaryEducation: {
-    type: [String],
-    required: false,
-  },
-  undergraduate: {
-    type: [String],
-    required: false,
-  },
-  postGraduate: {
-    type: [String],
-    required: false,
-  },
-  professionalTrainings: {
-    type: [String],
-    required: false,
-  },
-});
-
 const UserSchema = new mongoose.Schema(
   {
     firstName: {
@@ -107,12 +84,9 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    educationalBackground: EducationSchema,
+
     socialMedia: [SocialMediaSchema],
-    portfolio: {
-      type: String,
-      required: false,
-    },
+
     maritalStatus: {
       type: String,
       enum: ["single", "married", "divorced", "complicated"],
