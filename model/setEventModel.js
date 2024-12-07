@@ -1,22 +1,5 @@
 const mongoose = require("mongoose");
 
-// Schema for Related Events
-const RelatedEventSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  date: {
-    type: Date,
-    required: true,
-  },
-  icon: {
-    type: String, // Icon representation (e.g., FontAwesome or a URL)
-    default: "BsPinAngleFill", // Default icon for related events
-  },
-});
-
-// Schema for Main Event
 const EventSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -28,7 +11,7 @@ const EventSchema = new mongoose.Schema({
   },
   time: {
     type: String,
-    required: true, // Time in format "10:00 AM - 5:00 PM"
+    required: true,
   },
   location: {
     type: String,
@@ -39,14 +22,17 @@ const EventSchema = new mongoose.Schema({
     required: true,
   },
   bannerImage: {
-    type: String, // URL of the banner image
+    type: String,
     required: true,
   },
   isRsvp: {
     type: Boolean,
-    default: false, // Tracks RSVP status for the main event
+    default: false,
   },
-  relatedEvents: [RelatedEventSchema], // Array of related events
+  isPined: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const Event = mongoose.model("Event", EventSchema);
