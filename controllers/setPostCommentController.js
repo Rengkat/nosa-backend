@@ -1,5 +1,5 @@
 const CustomError = require("../errors");
-const SetPost = require("../model/setPostModel");
+const SetPostComment = require("../model/setPostCommentModel");
 const { StatusCodes } = require("http-status-codes");
 const addPostComment = async (req, res, next) => {};
 const getAllPostComments = async (req, res, next) => {};

@@ -33,6 +33,10 @@ const EventSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  set: {
+    type: mongoose.Schema.ObjectId,
+    ref: "Set",
+  },
 });
 
 const Event = mongoose.model("Event", EventSchema);

@@ -1,5 +1,5 @@
 const CustomError = require("../errors");
-const SetPost = require("../model/setPostModel");
+const SetMedia = require("../model/setMediaModel");
 const { StatusCodes } = require("http-status-codes");
 
 const addImage = async (req, res, next) => {};

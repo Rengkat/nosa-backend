@@ -6,7 +6,6 @@ const cloudinary = require("cloudinary").v2;
 const fs = require("node:fs");
 
 const addNewsAndBlog = async (req, res, next) => {
-  console.log(req.user);
   try {
     const { image, title, content, category, user } = req.body;
 

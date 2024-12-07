@@ -1,5 +1,5 @@
 const CustomError = require("../errors");
-const SetPost = require("../model/setPostModel");
+const SetDiscussion = require("../model/setDisscussionModel");
 const { StatusCodes } = require("http-status-codes");
 const sendMessage = async (req, res, next) => {};
 const getAllSetMessage = async (req, res, next) => {};
