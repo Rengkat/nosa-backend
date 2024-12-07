@@ -8,8 +8,8 @@ const PostSchema = new mongoose.Schema(
       trim: true,
     },
     image: {
-      type: String, // URL to the image
-      default: null, // Optional
+      type: String,
+      default: null,
     },
     set: { type: mongoose.Schema.ObjectId, ref: "Set", required: [true, "Set is required"] },
     author: {
