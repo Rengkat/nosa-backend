@@ -17,7 +17,7 @@ const MessageSchema = new mongoose.Schema({
 });
 
 // Schema for group discussions
-const GroupSchema = new mongoose.Schema({
+const GroupDiscussionSchema = new mongoose.Schema({
   name: {
     type: mongoose.Schema.ObjectId,
     ref: "Set",
@@ -31,6 +31,6 @@ const GroupSchema = new mongoose.Schema({
   },
 });
 
-const Group = mongoose.model("Group", GroupSchema);
+const Group = mongoose.model("GroupDiscussion", GroupDiscussionSchema);
 
 module.exports = Group;
