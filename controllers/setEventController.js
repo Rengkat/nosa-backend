@@ -73,7 +73,19 @@ const updateSetEvent = async (req, res, next) => {
     next(error);
   }
 };
-const deleteSetEvent = async (req, res, next) => {};
+const deleteSetEvent = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      throw new CustomError.BadRequestError("Please provide id");
+    }
+    await SetEvent.findByIdAndDelete(id);
+
+    res.status(StatusCodes.OK).json({ message: "Event deleted successfully", success: true });
+  } catch (error) {
+    next(error);
+  }
+};
 module.exports = {
   createSetEvent,
   getAllSetEvent,
