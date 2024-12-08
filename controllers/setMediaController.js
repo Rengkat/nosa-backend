@@ -3,7 +3,22 @@ const SetMedia = require("../model/setMediaModel");
 const { StatusCodes } = require("http-status-codes");
 
 const addImage = async (req, res, next) => {};
-const deleteImage = async (req, res, next) => {};
+const deleteImage = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      throw new CustomError.BadRequestError("Please provide media Id");
+    }
+    const image = await SetMedia.findByIdAndDelete(id);
+    if (!image) {
+      throw new CustomError.NotFoundError("Image not found");
+    }
+    res.status(StatusCodes.OK).json({ message: "Image deleted successfully", success: true });
+  } catch (error) {
+    next(error);
+    // 08146957156
+  }
+};
 const uploadSetMediaImage = async (req, res, next) => {
   try {
     if (!req.files || !req.files.image) {
