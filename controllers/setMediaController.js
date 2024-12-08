@@ -2,7 +2,18 @@ const CustomError = require("../errors");
 const SetMedia = require("../model/setMediaModel");
 const { StatusCodes } = require("http-status-codes");
 
-const addImage = async (req, res, next) => {};
+const addImage = async (req, res, next) => {
+  try {
+    const { imageUrl } = req.body;
+    if (!imageUrl) {
+      throw new CustomError.BadRequestError("Please provide image url");
+    }
+    await SetMedia.create({ imageUrl });
+    res.status(StatusCodes.CREATED).json({ message: "Media added successfully", success: true });
+  } catch (error) {
+    next(error);
+  }
+};
 const deleteImage = async (req, res, next) => {
   try {
     const { id } = req.params;
