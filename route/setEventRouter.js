@@ -5,6 +5,7 @@ const {
   getSingleSetEvent,
   updateSetEvent,
   deleteSetEvent,
+  uploadSetEventImage,
 } = require("../controllers/setEventController");
 const {
   authenticateUser,
@@ -22,6 +23,12 @@ router
     createSetEvent
   )
   .get(authenticateUser, getAllSetEvent);
+router.post(
+  "/upload-event-image",
+  authenticateUser,
+  superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin"),
+  uploadSetEventImage
+);
 router
   .route("/:id")
   .get(authenticateUser, getSingleSetEvent)

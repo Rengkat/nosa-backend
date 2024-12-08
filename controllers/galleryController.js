@@ -114,7 +114,6 @@ const uploadImage = async (req, res, next) => {
         .json({ message: "No image files uploaded", success: false });
     }
 
-    // Ensure the number of images does not exceed 3
     const imageFiles = Array.isArray(req.files.images) ? req.files.images : [req.files.images];
 
     if (imageFiles.length > 3) {
