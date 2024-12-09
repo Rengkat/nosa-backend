@@ -33,7 +33,7 @@ const getAllSetEvent = async (req, res, next) => {
   try {
     const { setId } = req.body;
     if (!setId) {
-      throw new CustomError.BadRequestError("Please provide set Id");
+      throw new CustomError.BadRequestError("Please provide set ID");
     }
     const set = await Set.findById(setId);
     if (!set) {
@@ -52,6 +52,9 @@ const getSingleSetEvent = async (req, res, next) => {
       throw new CustomError.BadRequestError("Please provide id");
     }
     const event = await SetEvent.findById(id);
+    if (!event) {
+      throw new CustomError.NotFoundError("Event not found");
+    }
     res.status(StatusCodes.OK).json({ event });
   } catch (error) {
     next(error);
@@ -67,7 +70,7 @@ const updateSetEvent = async (req, res, next) => {
     if (!event) {
       throw new CustomError.NotFoundError("Event not found");
     }
-    event.set(req.body);
+    Object.assign(event, req.body);
     await event.save();
     res.status(StatusCodes.OK).json({ message: "Event updated successfully", success: true });
   } catch (error) {
@@ -78,29 +81,26 @@ const deleteSetEvent = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!id) {
-      throw new CustomError.BadRequestError("Please provide id");
+      throw new CustomError.BadRequestError("Please provide ID");
     }
-    await SetEvent.findByIdAndDelete(id);
+    const event = await SetEvent.findByIdAndDelete(id);
+    if (!event) {
+      throw new CustomError.NotFoundError("Event not found");
+    }
 
     res.status(StatusCodes.OK).json({ message: "Event deleted successfully", success: true });
   } catch (error) {
     next(error);
   }
 };
-
 const uploadSetEventImage = async (req, res, next) => {
   try {
     if (!req.files || !req.files.image) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "No image file uploaded", success: false });
+      throw new CustomError.BadRequestError("No image file uploaded");
     }
 
     if (!fs.existsSync(req.files.image.tempFilePath)) {
-      // the file path
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "File not found", success: false });
+      throw new CustomError.BadRequestError("Temporary file not found");
     }
 
     const result = await cloudinary.uploader.upload(req.files.image.tempFilePath, {
@@ -110,11 +110,12 @@ const uploadSetEventImage = async (req, res, next) => {
 
     fs.unlinkSync(req.files.image.tempFilePath);
 
-    return res.status(StatusCodes.CREATED).json({ eventImgUrl: result.secure_url, success: true });
+    res.status(StatusCodes.CREATED).json({ eventImgUrl: result.secure_url, success: true });
   } catch (error) {
     next(error);
   }
 };
+
 module.exports = {
   createSetEvent,
   getAllSetEvent,
