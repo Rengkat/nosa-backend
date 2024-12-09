@@ -5,9 +5,9 @@ const Token = require("../model/Token");
 const { attachTokenToResponse, createUserPayload, sendVerificationEmail } = require("../utils");
 const crypto = require("crypto");
 const register = async (req, res, next) => {
-  const { firstName, surname, email, password } = req.body;
+  const { firstName, surname, email, password, yearOfGraduation } = req.body;
   try {
-    if (!firstName || !surname || !email || !password) {
+    if (!firstName || !surname || !email || !password || !yearOfGraduation) {
       throw new CustomError.BadRequestError("Please provide all credentials");
     }
 
@@ -27,6 +27,7 @@ const register = async (req, res, next) => {
       surname,
       email,
       password,
+      yearOfGraduation,
       role: assignedRole,
       emailVerificationToken,
       emailVerificationTokenExpirationDate,

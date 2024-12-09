@@ -1,10 +1,24 @@
 const CustomError = require("../errors");
 const SetPost = require("../model/setPostModel");
+const User = require("../model/userModel");
 const { StatusCodes } = require("http-status-codes");
 
 const createPost = async (req, res, next) => {
   try {
-    const {} = req.body;
+    const { content, image, set, author } = req.body;
+
+    if (!content || !set || !author) {
+      throw new CustomError.BadRequestError("Please provide content, set, and author details");
+    }
+
+    if (req.user.set !== set) {
+      throw new CustomError.UnauthorizedError(
+        "You are not authorized to post in this group. You are not a set member"
+      );
+    }
+    await SetPost.create({ content, image, set, author });
+
+    res.status(StatusCodes.CREATED).json({ message: "Post created successfully", success: true });
   } catch (error) {
     next(error);
   }
