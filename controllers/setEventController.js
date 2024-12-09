@@ -3,10 +3,12 @@ const SetEvent = require("../model/setEventModel");
 const { StatusCodes } = require("http-status-codes");
 const Set = require("../model/setModel");
 const fs = require("node:fs");
+const { default: mongoose } = require("mongoose");
 const cloudinary = require("cloudinary").v2;
 const createSetEvent = async (req, res, next) => {
   try {
-    const { title, date, time, location, description, bannerImage, isRsvp, isPined } = req.body;
+    const { set, title, date, time, location, description, bannerImage, isRsvp, isPined } =
+      req.body;
 
     if (!title || !date || !time || !location || !description || !bannerImage) {
       throw new CustomError.BadRequestError("Provide all event details");
@@ -21,6 +23,7 @@ const createSetEvent = async (req, res, next) => {
       bannerImage,
       isRsvp,
       isPined,
+      set,
     });
 
     res.status(StatusCodes.CREATED).json({ message: "Event Added successfully", success: true });
@@ -35,9 +38,12 @@ const getAllSetEvent = async (req, res, next) => {
     if (!setId) {
       throw new CustomError.BadRequestError("Please provide set ID");
     }
+    if (!mongoose.Types.ObjectId.isValid(setId)) {
+      throw new CustomError.BadRequestError("Invalid set ID format");
+    }
     const set = await Set.findById(setId);
     if (!set) {
-      throw CustomError.NotFoundError("Set not found");
+      throw new CustomError.NotFoundError("Set not found");
     }
     const events = await SetEvent.find({ set: setId });
     res.status(StatusCodes.OK).json({ events });
