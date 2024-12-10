@@ -14,3 +14,4 @@ const {
 
 const router = express.Router();
 router.route("/").post(authenticateUser, createPost).get(authenticateUser, getAllPost);
+router.route("/id").get(authenticateUser, getSinglePost);

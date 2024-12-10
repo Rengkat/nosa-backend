@@ -24,7 +24,7 @@ const createPost = async (req, res, next) => {
 };
 const getAllPost = async (req, res, next) => {
   try {
-    const { setId } = req.query; // Use query instead of body for GET requests
+    const { setId } = req.query; //
     if (!setId) {
       throw new CustomError.BadRequestError("Please provide set ID");
     }
@@ -41,8 +41,30 @@ const getAllPost = async (req, res, next) => {
     next(error);
   }
 };
+const getSinglePost = async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-const getSinglePost = async (req, res, next) => {};
+    if (!id) {
+      throw new CustomError.BadRequestError("Please provide post ID");
+    }
+
+    const post = await SetPost.findById(id)
+      .populate("set", "name")
+      .populate("author.name", "firstName lastName")
+      .populate("interactions.likes", "firstName lastName")
+      .populate("interactions.dislikes", "firstName lastName")
+      .populate("interactions.comments");
+
+    if (!post) {
+      throw new CustomError.NotFoundError("Post not found");
+    }
+
+    res.status(StatusCodes.OK).json({ post, success: true });
+  } catch (error) {
+    next(error);
+  }
+};
 const updatePost = async (req, res, next) => {};
 const deletePost = async (req, res, next) => {};
 module.exports = { createPost, updatePost, deletePost, getAllPost, getSinglePost };
