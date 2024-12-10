@@ -13,7 +13,18 @@ const addImage = async (req, res, next) => {
     next(error);
   }
 };
-
+const getAllSetMedia = async (req, res, next) => {
+  try {
+    const { setId } = req.query;
+    if (!setId) {
+      throw new CustomError.BadRequestError("Please provide set ID");
+    }
+    const setMedia = await SetMedia.find({ set: setId });
+    res.status(StatusCodes.OK).json({ setMedia, success: true });
+  } catch (error) {
+    next(error);
+  }
+};
 // Delete Image
 const deleteImage = async (req, res, next) => {
   try {
@@ -58,4 +69,5 @@ module.exports = {
   addImage,
   deleteImage,
   uploadSetMediaImage,
+  getAllSetMedia,
 };
