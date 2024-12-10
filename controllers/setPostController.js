@@ -1,6 +1,5 @@
 const CustomError = require("../errors");
 const SetPost = require("../model/setPostModel");
-const User = require("../model/userModel");
 const { StatusCodes } = require("http-status-codes");
 
 const createPost = async (req, res, next) => {
@@ -23,7 +22,26 @@ const createPost = async (req, res, next) => {
     next(error);
   }
 };
-const getAllPost = async (req, res, next) => {};
+const getAllPost = async (req, res, next) => {
+  try {
+    const { setId } = req.query; // Use query instead of body for GET requests
+    if (!setId) {
+      throw new CustomError.BadRequestError("Please provide set ID");
+    }
+
+    const posts = await SetPost.find({ set: setId })
+      .populate("set", "name")
+      .populate("author.name", "firstName surname")
+      .populate("interactions.likes", "firstName surname")
+      .populate("interactions.dislikes", "firstName surname")
+      .populate("interactions.comments");
+
+    res.status(StatusCodes.OK).json({ posts, success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getSinglePost = async (req, res, next) => {};
 const updatePost = async (req, res, next) => {};
 const deletePost = async (req, res, next) => {};
