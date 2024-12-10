@@ -65,6 +65,45 @@ const getSinglePost = async (req, res, next) => {
     next(error);
   }
 };
-const updatePost = async (req, res, next) => {};
-const deletePost = async (req, res, next) => {};
+const updatePost = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      throw new CustomError.BadRequestError("Please provide post ID");
+    }
+
+    const post = await SetPost.findById(id);
+
+    if (!post) {
+      throw new CustomError.NotFoundError("Post not found");
+    }
+
+    post.set(req.body);
+    await post.save();
+
+    res.status(StatusCodes.OK).json({ message: "Post updated successfully", success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+const deletePost = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      throw new CustomError.BadRequestError("Please provide post ID");
+    }
+
+    const post = await SetPost.findByIdAndDelete(id);
+
+    if (!post) {
+      throw new CustomError.NotFoundError("Post not found");
+    }
+
+    res.status(StatusCodes.OK).json({ message: "Post deleted successfully", success: true });
+  } catch (error) {
+    next(error);
+  }
+};
 module.exports = { createPost, updatePost, deletePost, getAllPost, getSinglePost };
