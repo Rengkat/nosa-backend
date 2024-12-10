@@ -6,11 +6,7 @@ const {
   getSinglePost,
   deletePost,
 } = require("../controllers/setPostController");
-const {
-  authenticateUser,
-  superAdminAuthorizationPermission,
-  superAdminAndSetAdminAuthorizationPermission,
-} = require("../middleware/authentication");
+const { authenticateUser } = require("../middleware/authentication");
 
 const router = express.Router();
 router.route("/").post(authenticateUser, createPost).get(authenticateUser, getAllPost);
@@ -19,3 +15,4 @@ router
   .get(authenticateUser, getSinglePost)
   .patch(authenticateUser, updatePost)
   .delete(authenticateUser, deletePost);
+module.exports = router;
