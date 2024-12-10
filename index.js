@@ -28,6 +28,7 @@ const achievementRoute = require("./route/achievementRoute");
 const statsRoute = require("./route/statsRoute");
 const setEventsRoute = require("./route/setEventRouter");
 const setPostsRoute = require("./route/setPostRouter");
+const setMediaRoute = require("./route/setMediaRoute");
 //middlewares importations
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
@@ -58,6 +59,7 @@ app.use("/api/national-officials", nationalOfficialsRoute);
 app.use("/api/nosa-sets", setRoute);
 app.use("/api/set-events", setEventsRoute);
 app.use("/api/set-posts", setPostsRoute);
+app.use("/api/set-medias", setMediaRoute);
 app.use("/api/gallery", galleryRoute);
 app.use("/api/news-and-blogs", newsAndBlogRoute);
 app.use("/api/events", eventRoute);
