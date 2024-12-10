@@ -30,6 +30,7 @@ const setEventsRoute = require("./route/setEventRouter");
 const setPostsRoute = require("./route/setPostRouter");
 const setMediaRoute = require("./route/setMediaRoute");
 const setPostCommentRoute = require("./route/setPostCommentRoute");
+const setDiscussionRoute = require("./route/setDiscussionRoute");
 //middlewares importations
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
@@ -62,6 +63,7 @@ app.use("/api/set-events", setEventsRoute);
 app.use("/api/set-posts", setPostsRoute);
 app.use("/api/set-medias", setMediaRoute);
 app.use("/api/set-post-comments", setPostCommentRoute);
+app.use("/api/set-discussions", setDiscussionRoute);
 app.use("/api/gallery", galleryRoute);
 app.use("/api/news-and-blogs", newsAndBlogRoute);
 app.use("/api/events", eventRoute);

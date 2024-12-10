@@ -10,21 +10,30 @@ const MessageSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  moderated: {
+    text: {
+      type: String,
+      default: null,
+    },
+    moderator: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+  },
   timestamp: {
     type: Date,
     default: Date.now,
   },
 });
 
-// Schema for group discussions
 const GroupDiscussionSchema = new mongoose.Schema({
   name: {
     type: mongoose.Schema.ObjectId,
     ref: "Set",
     required: true,
   },
-
-  messages: [MessageSchema], // Array of messages in the group
+  messages: [MessageSchema],
   createdAt: {
     type: Date,
     default: Date.now,
