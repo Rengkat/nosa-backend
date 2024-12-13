@@ -5,6 +5,8 @@ const {
   getSetAdmins,
   getSetVerifiedMembers,
   getSetUnVerifiedMembers,
+  uploadBannerImage,
+  uploadCoverImage,
 } = require("../controllers/setController");
 const {
   authenticateUser,
@@ -13,7 +15,6 @@ const {
 } = require("../middleware/authentication");
 
 const router = express.Router();
-// Route to create a new NOSA set and get all existing sets
 router
   .route("/")
   .get(getAllSets)
@@ -25,8 +26,8 @@ router
     [authenticateUser, superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin")],
     getSetAdmins
   );
-
-// Route to get all members of a specific NOSA set
+router.post("/upload-banner", uploadBannerImage);
+router.post("/upload-cover-image", uploadCoverImage);
 router.route("/:set/members").get(authenticateUser, getSetVerifiedMembers);
 router.route("/:set/unverified-members").get(authenticateUser, getSetUnVerifiedMembers);
 

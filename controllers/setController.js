@@ -59,13 +59,18 @@ const getSetVerifiedMembers = async (req, res, next) => {
 };
 const getSetUnVerifiedMembers = async (req, res, next) => {
   try {
-    const totalSetMembers = await User.countDocuments({ yearOfGraduation: set, isVerified: false });
+    const { set } = req.params;
+    const totalSetMembers = await User.countDocuments({
+      yearOfGraduation: set,
+      isVerified: false,
+    });
 
-    const members = await User.find({ yearOfGraduation: set, isVerified: false }).select(
-      "-password"
-    );
+    const members = await User.find({
+      yearOfGraduation: set,
+      isVerified: false,
+    }).select("-password");
 
-    res.status(StatusCodes.OK).json({ data: members, totalUnverifiedSetMembers });
+    res.status(StatusCodes.OK).json({ data: members, totalSetMembers });
   } catch (error) {
     next(error);
   }
@@ -77,7 +82,50 @@ const getSetAdmins = async (req, res, next) => {
       .sort("-yearOfGraduation")
       .select("-password");
     res.status(StatusCodes.OK).json({ setAdmin });
-  } catch (error) {}
+  } catch (error) {
+    next(error);
+  }
+};
+
+const uploadBannerImage = async (req, res, next) => {
+  try {
+    if (!req.files || !req.files.image) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "No image file uploaded", success: false });
+    }
+
+    const result = await cloudinary.uploader.upload(req.files.image.tempFilePath, {
+      use_filename: true,
+      folder: process.env.CLOUDINARY_FOLDER_NAME_USER_IMAGES,
+    });
+
+    fs.unlinkSync(req.files.image.tempFilePath);
+
+    return res.status(StatusCodes.CREATED).json({ imgUrl: result.secure_url, success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+const uploadCoverImage = async (req, res, next) => {
+  try {
+    if (!req.files || !req.files.image) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "No image file uploaded", success: false });
+    }
+
+    const result = await cloudinary.uploader.upload(req.files.image.tempFilePath, {
+      use_filename: true,
+      folder: process.env.CLOUDINARY_FOLDER_NAME_USER_IMAGES,
+    });
+
+    fs.unlinkSync(req.files.image.tempFilePath);
+
+    return res.status(StatusCodes.CREATED).json({ imgUrl: result.secure_url, success: true });
+  } catch (error) {
+    next(error);
+  }
 };
 module.exports = {
   createSet,
@@ -85,4 +133,6 @@ module.exports = {
   getSetAdmins,
   getSetVerifiedMembers,
   getSetUnVerifiedMembers,
+  uploadBannerImage,
+  uploadCoverImage,
 };
