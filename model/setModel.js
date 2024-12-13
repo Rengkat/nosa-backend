@@ -12,6 +12,12 @@ const SetSchema = new mongoose.Schema({
       ref: "User",
     },
   ],
+  banner: {
+    type: String,
+  },
+  coverImage: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model("Set", SetSchema);
