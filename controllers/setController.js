@@ -89,44 +89,83 @@ const getSetAdmins = async (req, res, next) => {
 
 const uploadBannerImage = async (req, res, next) => {
   try {
+    const { setId } = req.params;
+
     if (!req.files || !req.files.image) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "No image file uploaded", success: false });
     }
 
+    // Upload the image to Cloudinary
     const result = await cloudinary.uploader.upload(req.files.image.tempFilePath, {
       use_filename: true,
       folder: process.env.CLOUDINARY_FOLDER_NAME_USER_IMAGES,
     });
 
+    // Remove the temp file after upload
     fs.unlinkSync(req.files.image.tempFilePath);
 
-    return res.status(StatusCodes.CREATED).json({ imgUrl: result.secure_url, success: true });
+    // Update the banner field for the specified set
+    const updatedSet = await NosaSet.findByIdAndUpdate(
+      setId,
+      { banner: result.secure_url },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedSet) {
+      throw new CustomError.NotFoundError("Set not found");
+    }
+
+    return res.status(StatusCodes.OK).json({
+      message: "Banner image updated successfully",
+      success: true,
+      imgUrl: result.secure_url,
+    });
   } catch (error) {
     next(error);
   }
 };
 const uploadCoverImage = async (req, res, next) => {
   try {
+    const { setId } = req.params;
+
     if (!req.files || !req.files.image) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "No image file uploaded", success: false });
     }
 
+    // Upload the image to Cloudinary
     const result = await cloudinary.uploader.upload(req.files.image.tempFilePath, {
       use_filename: true,
       folder: process.env.CLOUDINARY_FOLDER_NAME_USER_IMAGES,
     });
 
+    // Remove the temp file after upload
     fs.unlinkSync(req.files.image.tempFilePath);
 
-    return res.status(StatusCodes.CREATED).json({ imgUrl: result.secure_url, success: true });
+    // Update the coverImage field for the specified set
+    const updatedSet = await NosaSet.findByIdAndUpdate(
+      setId,
+      { coverImage: result.secure_url },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedSet) {
+      throw new CustomError.NotFoundError("Set not found");
+    }
+
+    return res.status(StatusCodes.OK).json({
+      message: "Cover image updated successfully",
+      success: true,
+      imgUrl: result.secure_url,
+    });
   } catch (error) {
     next(error);
   }
 };
+
 module.exports = {
   createSet,
   getAllSets,
