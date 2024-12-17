@@ -10,16 +10,9 @@ const MessageSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  moderated: {
-    text: {
-      type: String,
-      default: null,
-    },
-    moderator: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      default: null,
-    },
+  isExplicitWord: {
+    type: Boolean,
+    default: false,
   },
   timestamp: {
     type: Date,
@@ -34,10 +27,6 @@ const GroupDiscussionSchema = new mongoose.Schema({
     required: true,
   },
   messages: [MessageSchema],
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
 });
 
 const Group = mongoose.model("GroupDiscussion", GroupDiscussionSchema);

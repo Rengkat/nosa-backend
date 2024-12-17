@@ -12,15 +12,14 @@ const {
   superAdminAndSetAdminAuthorizationPermission,
 } = require("../middleware/authentication");
 
-router.post("/message", authenticateUser, sendMessage);
-router.patch("/message", authenticateUser, updateMessage);
+router.route("/").post(authenticateUser, sendMessage).get(authenticateUser, getAllSetMessage);
 router.post(
-  "/message/moderate",
+  "/moderate",
   authenticateUser,
   superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin"),
   adminModerateMessage
 );
-router.get("/:setId/messages", getAllSetMessage);
+router.patch("/:messageId", authenticateUser, updateMessage);
 router.delete("/:setId/message/:messageId", authenticateUser, deleteMessage);
 
 module.exports = router;
