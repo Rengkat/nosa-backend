@@ -61,7 +61,7 @@ app.use("/api/national-officials", nationalOfficialsRoute);
 app.use("/api/nosa-sets", setRoute);
 app.use("/api/set-events", setEventsRoute);
 app.use("/api/set-posts", setPostsRoute);
-app.use("/api/set-medias", setMediaRoute);
+app.use("/api/set-media", setMediaRoute);
 app.use("/api/set-post-comments", setPostCommentRoute);
 app.use("/api/set-discussions", setDiscussionRoute);
 app.use("/api/gallery", galleryRoute);

@@ -1,21 +1,38 @@
+const { default: mongoose } = require("mongoose");
 const CustomError = require("../errors");
 const SetMedia = require("../model/setMediaModel");
 const { StatusCodes } = require("http-status-codes");
 const addImage = async (req, res, next) => {
   try {
-    const { imageUrl, caption, nosaSet, uploadedBy } = req.body;
-    if (!imageUrl) {
-      throw new CustomError.BadRequestError("Please provide image URL");
+    const { imageUrl, caption, nosaSet } = req.body;
+
+    if (!imageUrl || !Array.isArray(imageUrl) || imageUrl.length === 0) {
+      throw new CustomError.BadRequestError("Please provide at least one image URL");
     }
     if (!nosaSet) {
-      throw new CustomError.BadRequestError("Please provide nosa set");
+      throw new CustomError.BadRequestError("Please provide a valid nosa set");
     }
-    await SetMedia.create({ imageUrl, caption, nosaSet, uploadedBy });
-    res.status(StatusCodes.CREATED).json({ message: "Media added successfully", success: true });
+
+    if (!mongoose.Types.ObjectId.isValid(nosaSet)) {
+      throw new CustomError.BadRequestError("Invalid Nosa Set ID format");
+    }
+
+    await SetMedia.create({
+      imageUrl,
+      caption,
+      nosaSet,
+      uploadedBy: req.user.id,
+    });
+
+    res.status(StatusCodes.CREATED).json({
+      message: "Media added successfully",
+      success: true,
+    });
   } catch (error) {
     next(error);
   }
 };
+
 const getAllSetMedia = async (req, res, next) => {
   try {
     const { setId } = req.query;
@@ -28,18 +45,57 @@ const getAllSetMedia = async (req, res, next) => {
     next(error);
   }
 };
-// Delete Image
-const deleteImage = async (req, res, next) => {
+
+const getSingleDetailMedia = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!id) {
+      throw new CustomError.BadRequestError("Please provide ID");
+    }
+    const media = await SetMedia.findById(id);
+    res.status(StatusCodes.OK).json({ media, success: true });
+  } catch (error) {}
+};
+const deleteImage = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { imageUrl } = req.body;
+
+    if (!id) {
       throw new CustomError.BadRequestError("Please provide media ID");
     }
-    const image = await SetMedia.findByIdAndDelete(id);
-    if (!image) {
-      throw new CustomError.NotFoundError("Image not found");
+
+    const media = await SetMedia.findById(id);
+    if (!media) {
+      throw new CustomError.NotFoundError("Media not found");
     }
-    res.status(StatusCodes.OK).json({ message: "Image deleted successfully", success: true });
+
+    if (imageUrl) {
+      const updatedImageUrls = media.imageUrl.filter((url) => url !== imageUrl);
+
+      if (updatedImageUrls.length === 0) {
+        await SetMedia.findByIdAndDelete(id);
+        return res.status(StatusCodes.OK).json({
+          message: "Media deleted as no images remain",
+          success: true,
+        });
+      }
+
+      media.imageUrl = updatedImageUrls;
+      await media.save();
+
+      return res.status(StatusCodes.OK).json({
+        message: "Image deleted successfully",
+        success: true,
+        updatedMedia: media,
+      });
+    }
+
+    await SetMedia.findByIdAndDelete(id);
+    res.status(StatusCodes.OK).json({
+      message: "Media deleted successfully",
+      success: true,
+    });
   } catch (error) {
     next(error);
   }
@@ -89,6 +145,7 @@ const uploadSetMediaImage = async (req, res, next) => {
 };
 module.exports = {
   addImage,
+  getSingleDetailMedia,
   deleteImage,
   uploadSetMediaImage,
   getAllSetMedia,

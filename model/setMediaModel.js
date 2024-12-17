@@ -7,8 +7,8 @@ const MediaSchema = new mongoose.Schema(
       trim: true,
     },
     imageUrl: {
-      type: String,
-      required: [true, "Image URL is required"],
+      type: [String],
+      required: [true, "At least one image URL is required"],
     },
     uploadedBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -23,7 +23,6 @@ const MediaSchema = new mongoose.Schema(
     tags: {
       type: [String],
     },
-
     likes: {
       type: [mongoose.Schema.Types.ObjectId],
       ref: "User",
