@@ -3,11 +3,14 @@ const SetMedia = require("../model/setMediaModel");
 const { StatusCodes } = require("http-status-codes");
 const addImage = async (req, res, next) => {
   try {
-    const { imageUrl } = req.body;
+    const { imageUrl, caption, nosaSet, uploadedBy } = req.body;
     if (!imageUrl) {
       throw new CustomError.BadRequestError("Please provide image URL");
     }
-    await SetMedia.create({ imageUrl });
+    if (!nosaSet) {
+      throw new CustomError.BadRequestError("Please provide nosa set");
+    }
+    await SetMedia.create({ imageUrl, caption, nosaSet, uploadedBy });
     res.status(StatusCodes.CREATED).json({ message: "Media added successfully", success: true });
   } catch (error) {
     next(error);
@@ -19,7 +22,7 @@ const getAllSetMedia = async (req, res, next) => {
     if (!setId) {
       throw new CustomError.BadRequestError("Please provide set ID");
     }
-    const setMedia = await SetMedia.find({ set: setId });
+    const setMedia = await SetMedia.find({ nosaSet: setId });
     res.status(StatusCodes.OK).json({ setMedia, success: true });
   } catch (error) {
     next(error);
@@ -45,22 +48,41 @@ const deleteImage = async (req, res, next) => {
 // Upload Image to Cloudinary
 const uploadSetMediaImage = async (req, res, next) => {
   try {
-    if (!req.files || !req.files.image) {
-      throw new CustomError.BadRequestError("No image file uploaded");
+    // Check if files are uploaded
+    if (!req.files || !req.files.images || req.files.images.length === 0) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "No image files uploaded", success: false });
     }
 
-    if (!fs.existsSync(req.files.image.tempFilePath)) {
-      throw new CustomError.BadRequestError("Temporary file not found");
+    const imageFiles = Array.isArray(req.files.images) ? req.files.images : [req.files.images];
+
+    if (imageFiles.length > 3) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "You can upload a maximum of 3 images", success: false });
     }
 
-    const result = await cloudinary.uploader.upload(req.files.image.tempFilePath, {
-      use_filename: true,
-      folder: process.env.CLOUDINARY_SET_MEDIA_FOLDER_NAME || "default_folder",
-    });
+    const imageUrls = [];
+    for (const imageFile of imageFiles) {
+      if (!fs.existsSync(imageFile.tempFilePath)) {
+        return res
+          .status(StatusCodes.BAD_REQUEST)
+          .json({ message: "File not found", success: false });
+      }
 
-    fs.unlinkSync(req.files.image.tempFilePath);
+      const result = await cloudinary.uploader.upload(imageFile.tempFilePath, {
+        use_filename: true,
+        folder: process.env.CLOUDINARY_GALLERY_FOLDER_NAME,
+      });
 
-    res.status(StatusCodes.CREATED).json({ mediaImgUrl: result.secure_url, success: true });
+      imageUrls.push(result.secure_url);
+
+      // Remove the temporary file
+      fs.unlinkSync(imageFile.tempFilePath);
+    }
+
+    return res.status(StatusCodes.CREATED).json({ imgUrls: imageUrls, success: true });
   } catch (error) {
     next(error);
   }

@@ -2,12 +2,7 @@ const mongoose = require("mongoose");
 
 const MediaSchema = new mongoose.Schema(
   {
-    title: {
-      type: String,
-      required: [true, "Title is required"],
-      trim: true,
-    },
-    description: {
+    caption: {
       type: String,
       trim: true,
     },
@@ -18,27 +13,29 @@ const MediaSchema = new mongoose.Schema(
     uploadedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true, // Reference to the user who uploaded the media
+      required: true,
+    },
+    nosaSet: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "NosaSet",
+      required: true,
     },
     tags: {
-      type: [String], // Array of tags for categorization
+      type: [String],
     },
-    isPublic: {
-      type: Boolean,
-      default: true, // Determines visibility
-    },
+
     likes: {
       type: [mongoose.Schema.Types.ObjectId],
-      ref: "User", // Array of users who liked the media
+      ref: "User",
       default: [],
     },
     createdAt: {
       type: Date,
-      default: Date.now, // Timestamp for when the media was uploaded
+      default: Date.now,
     },
   },
   {
-    timestamps: true, // Adds createdAt and updatedAt fields
+    timestamps: true,
   }
 );
 

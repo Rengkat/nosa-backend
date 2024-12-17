@@ -71,9 +71,9 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    setOf: {
+    nosaSet: {
       type: mongoose.Types.ObjectId,
-      ref: "Set",
+      ref: "NosaSet",
       required: false,
     },
     position: {

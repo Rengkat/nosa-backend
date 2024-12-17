@@ -5,7 +5,7 @@ const createUserPayload = (user) => {
     role: user.role,
     email: user.email,
     id: user._id,
-    set: user.yearOfGraduation,
+    yearOfGraduation: user.yearOfGraduation,
   };
 };
 module.exports = createUserPayload;

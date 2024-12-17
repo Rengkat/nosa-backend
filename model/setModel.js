@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const SetSchema = new mongoose.Schema({
+const NosaSetSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "Provide set name!"],
@@ -20,4 +20,4 @@ const SetSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Set", SetSchema);
+module.exports = mongoose.model("NosaSet", NosaSetSchema);

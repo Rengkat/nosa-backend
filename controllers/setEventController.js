@@ -7,10 +7,10 @@ const { default: mongoose } = require("mongoose");
 const cloudinary = require("cloudinary").v2;
 const createSetEvent = async (req, res, next) => {
   try {
-    const { set, title, date, time, location, description, bannerImage, isRsvp, isPined } =
+    const { nosaSet, title, date, time, location, description, bannerImage, isRsvp, isPined } =
       req.body;
 
-    if (!title || !date || !time || !location || !description || !bannerImage) {
+    if (!nosaSet || !title || !date || !time || !location || !description || !bannerImage) {
       throw new CustomError.BadRequestError("Provide all event details");
     }
 
@@ -23,7 +23,7 @@ const createSetEvent = async (req, res, next) => {
       bannerImage,
       isRsvp,
       isPined,
-      set,
+      nosaSet,
     });
 
     res.status(StatusCodes.CREATED).json({ message: "Event Added successfully", success: true });
@@ -45,7 +45,7 @@ const getAllSetEvent = async (req, res, next) => {
     if (!set) {
       throw new CustomError.NotFoundError("Set not found");
     }
-    const events = await SetEvent.find({ set: setId });
+    const events = await SetEvent.find({ nosaSet: setId });
     res.status(StatusCodes.OK).json({ events });
   } catch (error) {
     next(error);

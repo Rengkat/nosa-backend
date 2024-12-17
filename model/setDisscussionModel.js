@@ -28,9 +28,9 @@ const MessageSchema = new mongoose.Schema({
 });
 
 const GroupDiscussionSchema = new mongoose.Schema({
-  name: {
+  nosaSet: {
     type: mongoose.Schema.ObjectId,
-    ref: "Set",
+    ref: "NosaSet",
     required: true,
   },
   messages: [MessageSchema],

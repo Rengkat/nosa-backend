@@ -100,37 +100,31 @@ const deleteUser = async (req, res) => {
 const updateCurrentUser = async (req, res, next) => {
   try {
     const { id } = req.user;
-    const { yearOfGraduation } = req.body;
+    const { yearOfGraduation, ...otherUpdates } = req.body;
 
     const user = await User.findById(id);
     if (!user) {
       throw new CustomError.NotFoundError("User not found");
     }
 
-    if (!yearOfGraduation) {
-      throw new CustomError.BadRequestError("Provide all details");
+    if (yearOfGraduation) {
+      const nosaSet = await NosaSet.findOne({ name: yearOfGraduation });
+      if (!nosaSet) {
+        throw new CustomError.NotFoundError("NOSA Set not found");
+      }
+      user.nosaSet = nosaSet._id;
+      if (!nosaSet.members.includes(id)) {
+        nosaSet.members.push(id);
+        await nosaSet.save();
+      }
     }
 
-    const nosaSet = await NosaSet.findOne({ name: yearOfGraduation });
-    if (!nosaSet) {
-      throw new CustomError.NotFoundError("NOSA Set not found");
-    }
-
-    user.set(req.body);
-
-    user.nosaSet = nosaSet._id;
-
+    user.set({ ...otherUpdates, yearOfGraduation });
     if (user.firstVisit) {
       user.firstVisit = false;
     }
 
     await user.save();
-
-    if (!nosaSet.members.includes(id)) {
-      nosaSet.members.push(id);
-      await nosaSet.save();
-    }
-
     res.status(StatusCodes.OK).json({
       success: true,
       message: "Your profile has been successfully updated",

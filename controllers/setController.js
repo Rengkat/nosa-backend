@@ -136,16 +136,13 @@ const uploadCoverImage = async (req, res, next) => {
         .json({ message: "No image file uploaded", success: false });
     }
 
-    // Upload the image to Cloudinary
     const result = await cloudinary.uploader.upload(req.files.image.tempFilePath, {
       use_filename: true,
       folder: process.env.CLOUDINARY_FOLDER_NAME_USER_IMAGES,
     });
 
-    // Remove the temp file after upload
     fs.unlinkSync(req.files.image.tempFilePath);
 
-    // Update the coverImage field for the specified set
     const updatedSet = await NosaSet.findByIdAndUpdate(
       setId,
       { coverImage: result.secure_url },

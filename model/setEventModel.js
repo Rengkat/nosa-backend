@@ -33,9 +33,9 @@ const EventSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  set: {
+  nosaSet: {
     type: mongoose.Schema.ObjectId,
-    ref: "Set",
+    ref: "NosaSet",
   },
 });
 
