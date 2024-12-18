@@ -123,27 +123,24 @@ const deleteMessage = async (req, res, next) => {
 };
 const adminModerateMessage = async (req, res, next) => {
   try {
-    const { setId, messageId, newText } = req.body;
+    const { setId, messageId } = req.body;
 
-    if (!setId || !messageId || !newText) {
+    if (!setId || !messageId) {
       throw new CustomError.BadRequestError("Set ID, message ID, and moderation text are required");
     }
 
     // Find the discussion group by Set ID
-    const group = await SetDiscussion.findOne({ name: setId });
+    const group = await SetDiscussion.findOne({ nosaSet: setId });
     if (!group) {
       throw new CustomError.NotFoundError("Group discussion not found for this set");
     }
 
-    // Find the message
     const message = group.messages.id(messageId);
     if (!message) {
       throw new CustomError.NotFoundError("Message not found");
     }
 
-    // Update the moderated field
-    message.moderated.text = newText;
-    message.moderated.moderator = req.user.id;
+    message.isExplicitWord = true;
 
     await group.save();
 

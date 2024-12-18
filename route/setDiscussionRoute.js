@@ -19,6 +19,12 @@ router.post(
   superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin"),
   adminModerateMessage
 );
+router.patch(
+  "/moderate-message",
+  authenticateUser,
+  superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin"),
+  adminModerateMessage
+);
 router.patch("/:messageId", authenticateUser, updateMessage);
 router.delete("/:messageId", authenticateUser, deleteMessage);
 
