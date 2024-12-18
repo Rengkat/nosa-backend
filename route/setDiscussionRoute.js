@@ -20,6 +20,6 @@ router.post(
   adminModerateMessage
 );
 router.patch("/:messageId", authenticateUser, updateMessage);
-router.delete("/:setId/message/:messageId", authenticateUser, deleteMessage);
+router.delete("/:messageId", authenticateUser, deleteMessage);
 
 module.exports = router;

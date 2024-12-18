@@ -91,34 +91,29 @@ const updateMessage = async (req, res, next) => {
 
 const deleteMessage = async (req, res, next) => {
   try {
-    const { groupId, messageId } = req.params;
+    const { messageId } = req.params;
+    const { setId } = req.query;
 
-    // Validate input
-    if (!groupId || !messageId) {
+    if (!setId || !messageId) {
       throw new CustomError.BadRequestError("Group ID and message ID are required");
     }
 
-    // Find the group
-    const group = await SetDiscussion.findById(groupId);
+    const group = await SetDiscussion.findOne({ nosaSet: setId });
     if (!group) {
-      throw new CustomError.NotFoundError("Group not found");
+      throw new CustomError.NotFoundError("NOSA Set not found");
     }
 
-    // Find the message
     const message = group.messages.id(messageId);
     if (!message) {
       throw new CustomError.NotFoundError("Message not found");
     }
 
-    // Check if the user is the sender of the message
     if (message.sender.toString() !== req.user.id) {
       throw new CustomError.UnauthorizedError("You are not authorized to delete this message");
     }
 
-    // Remove the message
-    message.remove();
+    group.messages.pull(messageId);
 
-    // Save the group
     await group.save();
 
     res.status(StatusCodes.OK).json({ success: true, message: "Message deleted" });
