@@ -5,9 +5,9 @@ const Token = require("../model/Token");
 const { attachTokenToResponse, createUserPayload, sendVerificationEmail } = require("../utils");
 const crypto = require("crypto");
 const register = async (req, res, next) => {
-  const { firstName, surname, email, password, yearOfGraduation } = req.body;
+  const { firstName, surname, email, password, nosaSet } = req.body;
   try {
-    if (!firstName || !surname || !email || !password || !yearOfGraduation) {
+    if (!firstName || !surname || !email || !password || !nosaSet) {
       throw new CustomError.BadRequestError("Please provide all credentials");
     }
 
@@ -27,7 +27,7 @@ const register = async (req, res, next) => {
       surname,
       email,
       password,
-      yearOfGraduation,
+      nosaSet,
       role: assignedRole,
       emailVerificationToken,
       emailVerificationTokenExpirationDate,
@@ -101,7 +101,7 @@ const login = async (req, res, next) => {
     }
     const user = await User.findOne({ email });
     if (!user) {
-      throw new CustomError.NotFound("User not found");
+      throw new CustomError.NotFoundError("User not found");
     }
     const isPasswordMatched = await user.comparedPassword(password);
     if (!isPasswordMatched) {

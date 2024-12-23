@@ -35,17 +35,9 @@ const updateSet = async (req, res, next) => {
 };
 const getAllSets = async (req, res, next) => {
   try {
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
+    const sets = await NosaSet.find().select("name").sort("name");
 
-    const totalSets = await NosaSet.countDocuments();
-
-    const sets = await NosaSet.find().skip(skip).limit(limit);
-    const totalPages = Math.ceil(totalSets / limit);
-    res
-      .status(StatusCodes.OK)
-      .json({ data: sets, totalSets, totalPages, currentPage: page, limit });
+    res.status(StatusCodes.OK).json({ sets });
   } catch (error) {
     next(error);
   }
@@ -131,7 +123,21 @@ const getSetAdmins = async (req, res, next) => {
     next(error);
   }
 };
-
+const getSingleSet = async (req, res, next) => {
+  try {
+    const { setId } = req.params;
+    if (!setId) {
+      throw new CustomError.BadRequestError("Please provide set ID");
+    }
+    const set = await NosaSet.findById(setId);
+    if (!set) {
+      throw new CustomError.NotFoundError("Set not found");
+    }
+    res.status(StatusCodes.OK).json({ set });
+  } catch (error) {
+    next(error);
+  }
+};
 const uploadBannerImage = async (req, res, next) => {
   try {
     const { setId } = req.params;
@@ -217,4 +223,5 @@ module.exports = {
   uploadBannerImage,
   uploadCoverImage,
   updateSet,
+  getSingleSet,
 };

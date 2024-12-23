@@ -19,6 +19,9 @@ const NosaSetSchema = new mongoose.Schema({
   coverImage: {
     type: String,
   },
+  description: {
+    type: String,
+  },
 });
 // For discussion group
 NosaSetSchema.post("save", async function (doc) {

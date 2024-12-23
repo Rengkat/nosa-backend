@@ -8,6 +8,7 @@ const {
   uploadBannerImage,
   uploadCoverImage,
   updateSet,
+  getSingleSet,
 } = require("../controllers/setController");
 const {
   authenticateUser,
@@ -29,7 +30,10 @@ router
   );
 router.post("/upload-banner", uploadBannerImage);
 router.post("/upload-cover-image", uploadCoverImage);
-router.route("/:setId").patch([authenticateUser, superAdminAuthorizationPermission], updateSet);
+router
+  .route("/:setId")
+  .get(authenticateUser, getSingleSet)
+  .patch([authenticateUser, superAdminAuthorizationPermission], updateSet);
 router.route("/:setId/verified-members").get(authenticateUser, getSetVerifiedMembers);
 router.route("/:setId/unverified-members").get(authenticateUser, getSetUnVerifiedMembers);
 
