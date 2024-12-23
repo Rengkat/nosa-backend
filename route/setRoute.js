@@ -29,8 +29,8 @@ router
   );
 router.post("/upload-banner", uploadBannerImage);
 router.post("/upload-cover-image", uploadCoverImage);
-router.route("/:set").patch([authenticateUser, superAdminAuthorizationPermission], updateSet);
-router.route("/:set/members").get(authenticateUser, getSetVerifiedMembers);
-router.route("/:set/unverified-members").get(authenticateUser, getSetUnVerifiedMembers);
+router.route("/:setId").patch([authenticateUser, superAdminAuthorizationPermission], updateSet);
+router.route("/:setId/verified-members").get(authenticateUser, getSetVerifiedMembers);
+router.route("/:setId/unverified-members").get(authenticateUser, getSetUnVerifiedMembers);
 
 module.exports = router;

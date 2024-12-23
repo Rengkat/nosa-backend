@@ -99,11 +99,23 @@ const deleteUser = async (req, res) => {
 };
 const updateCurrentUser = async (req, res, next) => {
   try {
-    const { id } = req.user;
+    const { id, yearOfGraduation } = req.user;
 
     const user = await User.findById(id);
     if (!user) {
       throw new CustomError.NotFoundError("User not found");
+    }
+
+    if (yearOfGraduation) {
+      const nosaSet = await NosaSet.findOne({ name: yearOfGraduation });
+      if (!nosaSet) {
+        throw new CustomError.NotFoundError("NOSA Set not found");
+      }
+      user.nosaSet = nosaSet._id;
+      if (!nosaSet.members.includes(id)) {
+        nosaSet.members.push(id);
+        await nosaSet.save();
+      }
     }
 
     user.set(req.body);

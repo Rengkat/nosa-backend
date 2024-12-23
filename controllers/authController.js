@@ -2,7 +2,6 @@ const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
 const User = require("../model/userModel");
 const Token = require("../model/Token");
-const NosaSet = require("../model/setModel");
 const { attachTokenToResponse, createUserPayload, sendVerificationEmail } = require("../utils");
 const crypto = require("crypto");
 const register = async (req, res, next) => {
@@ -19,17 +18,10 @@ const register = async (req, res, next) => {
 
     const userCount = await User.countDocuments();
     const assignedRole = userCount === 0 ? "superAdmin" : "member";
-
+    //CREATE TOKEN
+    const oneHour = 1000 * 60 * 60;
     const emailVerificationToken = crypto.randomBytes(40).toString("hex");
-    const emailVerificationTokenExpirationDate = new Date(Date.now() + 1000 * 60 * 60);
-
-    // Check for existing NOSA set
-    const nosaSet = await NosaSet.findOne({ name: yearOfGraduation });
-    if (!nosaSet) {
-      throw new CustomError.NotFoundError("NOSA Set not found");
-    }
-
-    // Create the user
+    const emailVerificationTokenExpirationDate = new Date(Date.now() + oneHour);
     const user = await User.create({
       firstName,
       surname,
@@ -39,22 +31,15 @@ const register = async (req, res, next) => {
       role: assignedRole,
       emailVerificationToken,
       emailVerificationTokenExpirationDate,
-      nosaSet: nosaSet._id,
     });
 
-    // Add user to NOSA set members if not already included
-    if (!nosaSet.members.includes(user._id)) {
-      nosaSet.members.push(user._id);
-      await nosaSet.save();
-    }
-
+    //send verification code
     await sendVerificationEmail({
       firstName: user.firstName,
       email: user.email,
       verificationToken: user.emailVerificationToken,
       origin: process.env.ORIGIN,
     });
-
     res.status(StatusCodes.CREATED).json({
       message: "Registration successful. Please check your email and verify it",
       success: true,
@@ -155,7 +140,7 @@ const login = async (req, res, next) => {
       message: "login successfully",
       user: userPayload,
       success: true,
-      // token: token.accessTokenJWT,cd
+      // token: token.accessTokenJWT,
     });
   } catch (error) {
     next(error);
