@@ -16,7 +16,24 @@ const createSet = async (req, res, next) => {
     next(error);
   }
 };
+const updateSet = async (req, res, next) => {
+  try {
+    const { set } = req.params;
+    const { name, banner, coverImage } = req.body;
+    if (!nosaSet) throw new CustomError.BadRequestError("Please provide set year");
 
+    const updatedSet = await NosaSet.findByIdAndUpdate(
+      set,
+      { name, banner, coverImage },
+      { new: true }
+    );
+    if (!updatedSet) throw new CustomError.NotFoundError("Set not found");
+
+    res.status(StatusCodes.OK).json({ message: "Set updated successfully", success: true });
+  } catch (error) {
+    next(error);
+  }
+};
 const getAllSets = async (req, res, next) => {
   try {
     const page = Number(req.query.page) || 1;
@@ -171,4 +188,5 @@ module.exports = {
   getSetUnVerifiedMembers,
   uploadBannerImage,
   uploadCoverImage,
+  updateSet,
 };

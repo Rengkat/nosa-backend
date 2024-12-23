@@ -62,7 +62,6 @@ const loginAdmin = async (req, res, next) => {
       message: "Admin login successful",
       user: userPayload,
       success: true,
-      token: token.accessTokenJWT,
     });
   } catch (error) {
     next(error);
