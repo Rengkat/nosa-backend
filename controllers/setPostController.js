@@ -4,18 +4,18 @@ const { StatusCodes } = require("http-status-codes");
 
 const createPost = async (req, res, next) => {
   try {
-    const { content, image, nosaSet, yearOfGraduation } = req.body;
+    const { content, image, nosaSet, isPinned } = req.body;
 
     if (!content || !nosaSet) {
-      throw new CustomError.BadRequestError("Please provide content, set, and author details");
+      throw new CustomError.BadRequestError("Please provide content and set");
     }
 
-    if (req.user.yearOfGraduation !== yearOfGraduation) {
+    if (req.user.nosaSet !== nosaSet) {
       throw new CustomError.UnauthorizedError(
         "You are not authorized to post in this group. You are not a set member"
       );
     }
-    await SetPost.create({ content, image, nosaSet, author: req.user.id });
+    await SetPost.create({ content, image, nosaSet, author: req.user.id, isPinned });
 
     res.status(StatusCodes.CREATED).json({ message: "Post created successfully", success: true });
   } catch (error) {
@@ -28,10 +28,10 @@ const getAllPost = async (req, res, next) => {
     if (!setId) {
       throw new CustomError.BadRequestError("Please provide set ID");
     }
-
     const posts = await SetPost.find({ nosaSet: setId })
+      .sort("-createdAt")
       .populate("nosaSet", "name")
-      .populate("author.name", "firstName surname")
+      .populate("author", "firstName surname")
       .populate("interactions.likes", "firstName surname")
       .populate("interactions.dislikes", "firstName surname")
       .populate("interactions.comments");
@@ -51,7 +51,7 @@ const getSinglePost = async (req, res, next) => {
 
     const post = await SetPost.findById(id)
       .populate("nosaSet", "name")
-      .populate("author.name", "firstName lastName")
+      .populate("author", "firstName lastName")
       .populate("interactions.likes", "firstName lastName")
       .populate("interactions.dislikes", "firstName lastName")
       .populate("interactions.comments");
@@ -68,7 +68,7 @@ const getSinglePost = async (req, res, next) => {
 const updatePost = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { content } = req.body;
+    const { content, isPinned } = req.body;
 
     if (!id) {
       throw new CustomError.BadRequestError("Please provide post ID");
@@ -81,6 +81,7 @@ const updatePost = async (req, res, next) => {
     }
 
     post.content = content;
+    post.isPinned = isPinned;
     await post.save();
 
     res.status(StatusCodes.OK).json({ message: "Post updated successfully", success: true });

@@ -34,7 +34,7 @@ const createSetEvent = async (req, res, next) => {
 
 const getAllSetEvent = async (req, res, next) => {
   try {
-    const { setId } = req.body;
+    const { setId } = req.query;
     if (!setId) {
       throw new CustomError.BadRequestError("Please provide set ID");
     }

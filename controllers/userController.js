@@ -147,7 +147,7 @@ const verifyUser = async (req, res, next) => {
       throw new CustomError.NotFoundError("User not found");
     }
 
-    if (user.isVerified) {
+    if (user.isSetAdminVerify) {
       return res.status(StatusCodes.OK).json({
         success: true,
         message: "User is already verified",

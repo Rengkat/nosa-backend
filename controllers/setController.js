@@ -4,13 +4,13 @@ const NosaSet = require("../model/setModel");
 const User = require("../model/userModel");
 const createSet = async (req, res, next) => {
   try {
-    const { nosaSet } = req.body;
+    const { nosaSet, description } = req.body;
     if (!nosaSet) throw new CustomError.BadRequestError("Please provide set year");
 
     const existingSet = await NosaSet.findOne({ name: nosaSet });
     if (existingSet) throw new CustomError.BadRequestError("Set already exists");
 
-    await NosaSet.create({ name: nosaSet });
+    await NosaSet.create({ name: nosaSet, description });
     res.status(StatusCodes.CREATED).json({ message: "A set created successfully", success: true });
   } catch (error) {
     next(error);
@@ -19,11 +19,11 @@ const createSet = async (req, res, next) => {
 const updateSet = async (req, res, next) => {
   try {
     const { setId } = req.params;
-    const { name, banner, coverImage } = req.body;
+    const { name, banner, coverImage, description } = req.body;
 
     const updatedSet = await NosaSet.findByIdAndUpdate(
       setId,
-      { name, banner, coverImage },
+      { name, banner, coverImage, description },
       { new: true }
     );
     if (!updatedSet) throw new CustomError.NotFoundError("Set not found");
@@ -35,7 +35,7 @@ const updateSet = async (req, res, next) => {
 };
 const getAllSets = async (req, res, next) => {
   try {
-    const sets = await NosaSet.find().select("name").sort("name");
+    const sets = await NosaSet.find().sort("name");
 
     res.status(StatusCodes.OK).json({ sets });
   } catch (error) {

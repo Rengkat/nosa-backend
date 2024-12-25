@@ -2,6 +2,7 @@ const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
 const User = require("../model/userModel");
 const Token = require("../model/Token");
+const NosaSet = require("../model/setModel");
 const { attachTokenToResponse, createUserPayload, sendVerificationEmail } = require("../utils");
 const crypto = require("crypto");
 const register = async (req, res, next) => {
@@ -32,7 +33,12 @@ const register = async (req, res, next) => {
       emailVerificationToken,
       emailVerificationTokenExpirationDate,
     });
-
+    const set = await NosaSet.findById(nosaSet);
+    if (!set) {
+      throw new CustomError.NotFoundError("Not found NOSA set");
+    }
+    set.members.push(user._id);
+    await set.save();
     //send verification code
     await sendVerificationEmail({
       firstName: user.firstName,

@@ -45,7 +45,6 @@ const getAllSetMessage = async (req, res, next) => {
       "messages.sender",
       "firstName surname"
     );
-
     if (!group) {
       throw new CustomError.NotFoundError("Group discussion not found for this set");
     }
