@@ -10,7 +10,7 @@ const addNewsAndBlog = async (req, res, next) => {
     const { image, title, content, category, user } = req.body;
 
     // Check if required fields are provided
-    if (!image || !content || !title || !category || !user) {
+    if (!image || !content || !title || !category) {
       throw new CustomError.BadRequestError("Please provide all details");
     }
 
