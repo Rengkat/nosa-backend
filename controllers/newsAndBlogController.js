@@ -7,7 +7,7 @@ const fs = require("node:fs");
 
 const addNewsAndBlog = async (req, res, next) => {
   try {
-    const { image, title, content, category, user } = req.body;
+    const { image, title, content, category, user, description } = req.body;
 
     // Check if required fields are provided
     if (!image || !content || !title || !category) {
@@ -20,6 +20,7 @@ const addNewsAndBlog = async (req, res, next) => {
       content,
       category,
       user,
+      description,
     });
 
     res.status(StatusCodes.CREATED).json({
@@ -49,14 +50,7 @@ const getAllNewsAndBlogs = async (req, res, next) => {
     next(error);
   }
 };
-const getAllEvents = async (req, res, next) => {
-  try {
-    const events = await NewsAndBlog.find({ category: "event" });
-    res.status(StatusCodes.OK).json({ data: events });
-  } catch (error) {
-    next(error);
-  }
-};
+
 const getAllNews = async (req, res, next) => {
   try {
     const news = await NewsAndBlog.find({ category: "news" });
@@ -67,7 +61,10 @@ const getAllNews = async (req, res, next) => {
 };
 const getAllBlogs = async (req, res, next) => {
   try {
-    const blogs = await NewsAndBlog.find({ category: "blog" });
+    const blogs = await NewsAndBlog.find({ category: "blog" }).populate(
+      "user",
+      "firstName surname fullName"
+    );
     res.status(StatusCodes.OK).json({ data: blogs });
   } catch (error) {
     next(error);
@@ -91,7 +88,7 @@ const getSingleNewsOrBlog = async (req, res, next) => {
 const updateNewsOrBlog = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { image, title, content, category, user } = req.body;
+    const { image, title, content, category, user, description } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new CustomError.BadRequestError("Invalid ID format");
@@ -99,7 +96,7 @@ const updateNewsOrBlog = async (req, res, next) => {
 
     const updatedNewsOrBlog = await NewsAndBlog.findByIdAndUpdate(
       id,
-      { image, title, content, category, user },
+      { image, title, content, category, user, description },
       { new: true, runValidators: true }
     );
 
@@ -169,7 +166,6 @@ module.exports = {
   getAllNewsAndBlogs,
   getSingleNewsOrBlog,
   uploadNewsOrBlogImage,
-  getAllEvents,
   getAllBlogs,
   getAllNews,
 };

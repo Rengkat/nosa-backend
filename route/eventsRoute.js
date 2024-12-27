@@ -1,10 +1,30 @@
 const express = require("express");
-const { getAllEvents } = require("../controllers/newsAndBlogController");
+const {
+  addEvent,
+  updateEvent,
+  removeEvent,
+  uploadEventImage,
+  getAllEvents,
+  getSingleEvent,
+} = require("../controllers/eventController");
 const {
   authenticateUser,
   superAdminAuthorizationPermission,
 } = require("../middleware/authentication");
 
 const router = express.Router();
-router.get("/", getAllEvents);
+router
+  .route("/")
+  .get(getAllEvents)
+  .post(authenticateUser, superAdminAuthorizationPermission, addEvent);
+router.post(
+  "/uploadImage",
+  [authenticateUser, superAdminAuthorizationPermission],
+  uploadEventImage
+);
+router
+  .route("/:id")
+  .get(getSingleEvent)
+  .patch([authenticateUser, superAdminAuthorizationPermission], updateEvent)
+  .delete([authenticateUser, superAdminAuthorizationPermission], removeEvent);
 module.exports = router;
