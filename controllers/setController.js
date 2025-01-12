@@ -2,6 +2,8 @@ const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
 const NosaSet = require("../model/setModel");
 const User = require("../model/userModel");
+const cloudinary = require("cloudinary").v2;
+const fs = require("node:fs");
 const createSet = async (req, res, next) => {
   try {
     const { nosaSet, description } = req.body;
@@ -151,7 +153,7 @@ const uploadBannerImage = async (req, res, next) => {
     // Upload the image to Cloudinary
     const result = await cloudinary.uploader.upload(req.files.image.tempFilePath, {
       use_filename: true,
-      folder: process.env.CLOUDINARY_FOLDER_NAME_USER_IMAGES,
+      folder: process.env.CLOUDINARY_SET_BANNER_FOLDER_NAME,
     });
 
     // Remove the temp file after upload
@@ -189,7 +191,7 @@ const uploadCoverImage = async (req, res, next) => {
 
     const result = await cloudinary.uploader.upload(req.files.image.tempFilePath, {
       use_filename: true,
-      folder: process.env.CLOUDINARY_FOLDER_NAME_USER_IMAGES,
+      folder: process.env.CLOUDINARY_SET_COVER_IMAGE_FOLDER_NAME,
     });
 
     fs.unlinkSync(req.files.image.tempFilePath);

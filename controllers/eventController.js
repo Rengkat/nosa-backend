@@ -111,7 +111,7 @@ const uploadEventImage = async (req, res, next) => {
 
     const result = await cloudinary.uploader.upload(req.files.image.tempFilePath, {
       use_filename: true,
-      folder: process.env.CLOUDINARY_NEWS_AND_BLOG_FOLDER_NAME,
+      folder: process.env.CLOUDINARY_EVENTS_FOLDER_NAME,
     });
 
     fs.unlinkSync(req.files.image.tempFilePath);

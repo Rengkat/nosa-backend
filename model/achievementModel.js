@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const AchievementSchema = mongoose.Schema({
+const AchievementSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,

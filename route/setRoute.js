@@ -28,13 +28,23 @@ router
     [authenticateUser, superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin")],
     getSetAdmins
   );
-router.post("/upload-banner", uploadBannerImage);
-router.post("/upload-cover-image", uploadCoverImage);
 router
   .route("/:setId")
   .get(authenticateUser, getSingleSet)
   .patch([authenticateUser, superAdminAuthorizationPermission], updateSet);
 router.route("/:setId/verified-members").get(authenticateUser, getSetVerifiedMembers);
 router.route("/:setId/unverified-members").get(authenticateUser, getSetUnVerifiedMembers);
+router.post(
+  "/:setId/upload-banner",
+  authenticateUser,
+  superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin"),
+  uploadBannerImage
+);
+router.post(
+  "/:setId/upload-cover-image",
+  authenticateUser,
+  superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin"),
+  uploadCoverImage
+);
 
 module.exports = router;
