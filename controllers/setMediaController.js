@@ -2,6 +2,8 @@ const { default: mongoose } = require("mongoose");
 const CustomError = require("../errors");
 const SetMedia = require("../model/setMediaModel");
 const { StatusCodes } = require("http-status-codes");
+const cloudinary = require("cloudinary").v2;
+const fs = require("node:fs");
 const addImage = async (req, res, next) => {
   try {
     const { imageUrl, caption, nosaSet } = req.body;
@@ -129,7 +131,7 @@ const uploadSetMediaImage = async (req, res, next) => {
 
       const result = await cloudinary.uploader.upload(imageFile.tempFilePath, {
         use_filename: true,
-        folder: process.env.CLOUDINARY_GALLERY_FOLDER_NAME,
+        folder: process.env.CLOUDINARY_SET_MEDIA_FOLDER_NAME,
       });
 
       imageUrls.push(result.secure_url);

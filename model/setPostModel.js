@@ -30,7 +30,7 @@ const PostSchema = new mongoose.Schema(
       likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
       dislikes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
       comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
-      shares: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+      // shares: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     },
     isPinned: {
       type: Boolean,

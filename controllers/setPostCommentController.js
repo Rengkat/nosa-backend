@@ -17,8 +17,9 @@ const addPostComment = async (req, res, next) => {
     }
 
     // Verify post existence if it's a top-level comment
+    let post;
     if (postId) {
-      const post = await SetPost.findById(postId);
+      post = await SetPost.findById(postId);
       if (!post) {
         throw new CustomError.NotFoundError("Post not found");
       }
@@ -32,17 +33,24 @@ const addPostComment = async (req, res, next) => {
       }
     }
 
-    // Create the comment or reply
+    // Create the comment
     const newComment = await Comment.create({
       post: postId || undefined,
       author: req.user.id,
       content,
     });
 
-    // If it's a reply, update the parent comment's replies array
+    // Add to parent comment's replies array if it's a reply
     if (parentCommentId) {
       await Comment.findByIdAndUpdate(parentCommentId, {
         $push: { replies: newComment._id },
+      });
+    }
+
+    // Add to post's interactions.comments array for top-level comments and replies
+    if (postId) {
+      await SetPost.findByIdAndUpdate(postId, {
+        $push: { "interactions.comments": newComment._id },
       });
     }
 
@@ -65,7 +73,7 @@ const getAllPostComments = async (req, res, next) => {
       throw new CustomError.BadRequestError("Post ID is required");
     }
 
-    const comments = await Comment.find({ post: postId, replies: { $size: 0 } }) // Fetch top-level comments only
+    const comments = await Comment.find({ post: postId })
       .populate("author", "firstName surname image")
       .populate({
         path: "replies",
