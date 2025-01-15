@@ -96,26 +96,42 @@ const updatePost = async (req, res, next) => {
 const likePost = async (req, res, next) => {
   try {
     const { postId } = req.body;
+    const userId = req.user.id;
 
     // Find the post by ID
-    const post = await SetPost.findById(postId);
+    const post = await Post.findById(postId); // Ensure you're using the correct model name
     if (!post) {
       throw new CustomError.NotFoundError("Post not found");
     }
 
-    const userId = req.user.id;
+    let message = "";
 
+    // Check if the user has already liked the post
     if (post.interactions.likes.includes(userId)) {
+      // Remove the like
       post.interactions.likes = post.interactions.likes.filter(
         (like) => like.toString() !== userId
       );
-      await post.save();
-      return res.status(StatusCodes.OK).json({ message: "Post unliked successfully" });
+      message = "Post unliked successfully";
+    } else {
+      // Check if the user has disliked the post
+      if (post.interactions.dislikes.includes(userId)) {
+        // Remove the dislike
+        post.interactions.dislikes = post.interactions.dislikes.filter(
+          (dislike) => dislike.toString() !== userId
+        );
+      }
+
+      // Add the like
+      post.interactions.likes.push(userId);
+      message = "Post liked successfully";
     }
 
-    post.interactions.likes.push(userId);
+    // Save the post after updating interactions
     await post.save();
-    return res.status(StatusCodes.OK).json({ message: "Post liked successfully" });
+
+    // Return a response with the appropriate message
+    return res.status(StatusCodes.OK).json({ message });
   } catch (error) {
     next(error);
   }
@@ -123,26 +139,42 @@ const likePost = async (req, res, next) => {
 const dislikePost = async (req, res, next) => {
   try {
     const { postId } = req.body;
+    const userId = req.user.id;
 
     // Find the post by ID
-    const post = await SetPost.findById(postId);
+    const post = await Post.findById(postId); // Ensure the correct model is used
     if (!post) {
       throw new CustomError.NotFoundError("Post not found");
     }
 
-    const userId = req.user.id;
+    let message = "";
 
+    // Check if the user has already disliked the post
     if (post.interactions.dislikes.includes(userId)) {
+      // Remove the dislike
       post.interactions.dislikes = post.interactions.dislikes.filter(
-        (like) => like.toString() !== userId
+        (dislike) => dislike.toString() !== userId
       );
-      await post.save();
-      return res.status(StatusCodes.OK).json({ message: "Post unliked successfully" });
+      message = "Dislike removed successfully";
+    } else {
+      // Check if the user has liked the post
+      if (post.interactions.likes.includes(userId)) {
+        // Remove the like
+        post.interactions.likes = post.interactions.likes.filter(
+          (like) => like.toString() !== userId
+        );
+      }
+
+      // Add the dislike
+      post.interactions.dislikes.push(userId);
+      message = "Post disliked successfully";
     }
 
-    post.interactions.dislikes.push(userId);
+    // Save the post after updating interactions
     await post.save();
-    return res.status(StatusCodes.OK).json({ message: "Post liked successfully" });
+
+    // Return a response with the appropriate message
+    return res.status(StatusCodes.OK).json({ message });
   } catch (error) {
     next(error);
   }
