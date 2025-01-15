@@ -120,6 +120,33 @@ const likePost = async (req, res, next) => {
     next(error);
   }
 };
+const dislikePost = async (req, res, next) => {
+  try {
+    const { postId } = req.body;
+
+    // Find the post by ID
+    const post = await SetPost.findById(postId);
+    if (!post) {
+      throw new CustomError.NotFoundError("Post not found");
+    }
+
+    const userId = req.user.id;
+
+    if (post.interactions.dislikes.includes(userId)) {
+      post.interactions.dislikes = post.interactions.dislikes.filter(
+        (like) => like.toString() !== userId
+      );
+      await post.save();
+      return res.status(StatusCodes.OK).json({ message: "Post unliked successfully" });
+    }
+
+    post.interactions.dislikes.push(userId);
+    await post.save();
+    return res.status(StatusCodes.OK).json({ message: "Post liked successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
 
 const deletePost = async (req, res, next) => {
   try {
@@ -162,4 +189,13 @@ const uploadImage = async (req, res, next) => {
     next(error);
   }
 };
-module.exports = { createPost, updatePost, deletePost, getAllPost, getSinglePost, uploadImage };
+module.exports = {
+  createPost,
+  updatePost,
+  deletePost,
+  getAllPost,
+  getSinglePost,
+  likePost,
+  dislikePost,
+  uploadImage,
+};
