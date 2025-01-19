@@ -46,10 +46,18 @@ cloudniary.config({
   api_secret: process.env.CLOUTINARY_CLOUD_API_SECRET,
 });
 // app.use(cors());
+const allowedOrigins = ["http://localhost:3000", "https://nosa-nakam.vercel.app"];
+
 app.use(
   cors({
-    origin: "http://localhost:3000", // Replace with your frontend port
-    credentials: true, // Allows cookies to be sent with requests
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
   })
 );
 

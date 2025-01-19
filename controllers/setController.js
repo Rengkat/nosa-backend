@@ -93,11 +93,10 @@ const getSetUnVerifiedMembers = async (req, res, next) => {
       match: { isSetAdminVerify: false },
       select: "-password",
     });
-
     if (!nosaSet) {
       throw new CustomError.NotFoundError("Set not found");
     }
-
+    //
     // Paginate the members
     const totalSetMembers = nosaSet.members.length;
     const totalPages = Math.ceil(totalSetMembers / limit);
@@ -142,8 +141,6 @@ const getSingleSet = async (req, res, next) => {
 };
 const uploadBannerImage = async (req, res, next) => {
   try {
-    const { setId } = req.params;
-
     if (!req.files || !req.files.image) {
       return res
         .status(StatusCodes.BAD_REQUEST)
@@ -159,17 +156,6 @@ const uploadBannerImage = async (req, res, next) => {
     // Remove the temp file after upload
     fs.unlinkSync(req.files.image.tempFilePath);
 
-    // Update the banner field for the specified set
-    const updatedSet = await NosaSet.findByIdAndUpdate(
-      setId,
-      { banner: result.secure_url },
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedSet) {
-      throw new CustomError.NotFoundError("Set not found");
-    }
-
     return res.status(StatusCodes.OK).json({
       message: "Banner image updated successfully",
       success: true,
@@ -181,8 +167,6 @@ const uploadBannerImage = async (req, res, next) => {
 };
 const uploadCoverImage = async (req, res, next) => {
   try {
-    const { setId } = req.params;
-
     if (!req.files || !req.files.image) {
       return res
         .status(StatusCodes.BAD_REQUEST)
@@ -195,16 +179,6 @@ const uploadCoverImage = async (req, res, next) => {
     });
 
     fs.unlinkSync(req.files.image.tempFilePath);
-
-    const updatedSet = await NosaSet.findByIdAndUpdate(
-      setId,
-      { coverImage: result.secure_url },
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedSet) {
-      throw new CustomError.NotFoundError("Set not found");
-    }
 
     return res.status(StatusCodes.OK).json({
       message: "Cover image updated successfully",

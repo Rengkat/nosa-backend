@@ -99,7 +99,7 @@ const likePost = async (req, res, next) => {
     const userId = req.user.id;
 
     // Find the post by ID
-    const post = await Post.findById(postId); // Ensure you're using the correct model name
+    const post = await SetPost.findById(postId);
     if (!post) {
       throw new CustomError.NotFoundError("Post not found");
     }
@@ -142,7 +142,7 @@ const dislikePost = async (req, res, next) => {
     const userId = req.user.id;
 
     // Find the post by ID
-    const post = await Post.findById(postId); // Ensure the correct model is used
+    const post = await SetPost.findById(postId);
     if (!post) {
       throw new CustomError.NotFoundError("Post not found");
     }

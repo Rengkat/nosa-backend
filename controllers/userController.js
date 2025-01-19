@@ -26,7 +26,11 @@ const getAllVerifiedUsers = async (req, res, next) => {
 
     const totalUsers = await User.countDocuments(query);
 
-    const users = await User.find(query).select("-password").skip(skip).limit(limit);
+    const users = await User.find(query)
+      .populate("nosaSet", "name -_id")
+      .select("-password")
+      .skip(skip)
+      .limit(limit);
 
     const totalPages = Math.ceil(totalUsers / limit);
 
@@ -99,23 +103,9 @@ const deleteUser = async (req, res) => {
 };
 const updateCurrentUser = async (req, res, next) => {
   try {
-    const { id, yearOfGraduation } = req.user;
-
-    const user = await User.findById(id);
+    const user = await User.findById(req.user.id);
     if (!user) {
       throw new CustomError.NotFoundError("User not found");
-    }
-
-    if (yearOfGraduation) {
-      const nosaSet = await NosaSet.findOne({ name: yearOfGraduation });
-      if (!nosaSet) {
-        throw new CustomError.NotFoundError("NOSA Set not found");
-      }
-      user.nosaSet = nosaSet._id;
-      if (!nosaSet.members.includes(id)) {
-        nosaSet.members.push(id);
-        await nosaSet.save();
-      }
     }
 
     user.set(req.body);
@@ -169,15 +159,28 @@ const verifyUser = async (req, res, next) => {
 const updateUser = async (req, res, next) => {
   try {
     const { userId } = req.params;
+    const { setId, ...updateData } = req.body;
+
     const user = await User.findById(userId);
-    const currentUser = await User.findById(req.user.id);
     if (!user) {
       throw new CustomError.NotFoundError("User not found");
     }
 
-    checkPermission(currentUser, user);
+    if (setId) {
+      const nosaSet = await NosaSet.findById(setId);
+      if (!nosaSet) {
+        throw new CustomError.NotFoundError("NOSA Set not found");
+      }
 
-    user.set(req.body);
+      user.nosaSet = nosaSet._id;
+
+      if (!nosaSet.members.includes(user._id.toString())) {
+        nosaSet.members.push(user._id);
+        await nosaSet.save();
+      }
+    }
+
+    user.set(updateData);
     await user.save();
 
     res.status(StatusCodes.OK).json({

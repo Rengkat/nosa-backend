@@ -92,7 +92,7 @@ const verifyEmail = async (req, res, next) => {
 
     res.status(StatusCodes.OK).json({
       success: true,
-      message: "Email successfully verified",
+      message: "Email successfully verified. Wait for the set Admin to approve your request",
     });
   } catch (error) {
     next(error);
@@ -116,6 +116,9 @@ const login = async (req, res, next) => {
     //check if user is verified
     if (!user.isVerified) {
       throw new CustomError.UnauthenticatedError("Please verify your email");
+    }
+    if (!user.isSetAdminVerify) {
+      throw new CustomError.UnauthenticatedError("Your set admin is yet to approve your request");
     }
     //refresh token
     let refreshToken = "";
