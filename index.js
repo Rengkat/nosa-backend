@@ -1,9 +1,10 @@
 require("dotenv").config(); //to get resources from .env file
-
+const http = require("http");
+const { Server } = require("socket.io");
 // express
 const express = require("express");
 const app = express();
-
+const server = http.createServer(app);
 //rest of packages importations
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
@@ -60,7 +61,12 @@ app.use(
     credentials: true,
   })
 );
-
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    credentials: true,
+  },
+});
 //route initialization
 app.use("/api/auth", authRoute);
 app.use("/api/admin-auth", adminAuthRoute);
@@ -79,6 +85,22 @@ app.use("/api/showcase", showcaseRoute);
 app.use("/api/achievements", achievementRoute);
 app.use("/api/stats", statsRoute);
 
+// socket
+
+io.on("connection", (socket) => {
+  console.log("New user is connected", socket.id);
+  socket.on("joinDiscussion", ({ setId, userId }) => {
+    socket.join(userId); //JOIN THE DISCUSSION
+    console.log(`${userId} join ${setId} discussion`);
+  });
+  socket.on("sendMessage", ({ setId, text, sender }) => {
+    // Broadcast to the group
+    io.to(setId).emit("newMessage", { text, sender, timestamp: new Date() });
+  });
+  socket.on("disconnect", () => {
+    console.log("Client disconnected:", socket.id);
+  });
+});
 //errors initialization
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
@@ -87,7 +109,7 @@ const port = process.env.PORT || 5000;
 const start = async () => {
   try {
     await connectDB(process.env.MONGODB_URI);
-    app.listen(port, () => console.log(`Server is running on port ${port}...`));
+    server.listen(port, () => console.log(`Server is running on port ${port}...`));
   } catch (error) {
     console.log(error.message);
     process.exit(1);
