@@ -15,7 +15,9 @@ const sendMessage = async (req, res, next) => {
     if (!group) {
       throw new CustomError.NotFoundError("Group discussion not found for this set");
     }
-
+    if (!req.user.isSetAdminVerify) {
+      throw new CustomError.BadRequestError("You are not verified by your set admin");
+    }
     const newMessage = {
       text,
       sender: req.user.id,
@@ -26,6 +28,8 @@ const sendMessage = async (req, res, next) => {
     group.messages.push(newMessage);
 
     await group.save();
+    // Emit the message to the group chat
+    io.to(setId).emit("newMessage", { text, sender: req.user.id, timestamp: new Date() });
 
     res.status(StatusCodes.CREATED).json({ success: true, message: "Message sent successfully" });
   } catch (error) {

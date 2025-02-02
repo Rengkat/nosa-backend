@@ -1,6 +1,7 @@
 require("dotenv").config(); //to get resources from .env file
 const http = require("http");
 const { Server } = require("socket.io");
+const SetDiscussion = require("./model/setDisscussionModel");
 // express
 const express = require("express");
 const app = express();
@@ -86,21 +87,44 @@ app.use("/api/achievements", achievementRoute);
 app.use("/api/stats", statsRoute);
 
 // socket
-
 io.on("connection", (socket) => {
   console.log("New user is connected", socket.id);
+
   socket.on("joinDiscussion", ({ setId, userId }) => {
-    socket.join(userId); //JOIN THE DISCUSSION
-    console.log(`${userId} join ${setId} discussion`);
+    socket.join(setId); // JOIN THE DISCUSSION
+    console.log(`${userId} joined discussion ${setId}`);
   });
-  socket.on("sendMessage", ({ setId, text, sender }) => {
-    // Broadcast to the group
-    io.to(setId).emit("newMessage", { text, sender, timestamp: new Date() });
+
+  socket.on("sendMessage", async ({ setId, text, sender }) => {
+    try {
+      const group = await SetDiscussion.findOne({ nosaSet: setId });
+
+      if (!group) {
+        throw new Error("Group discussion not found for this set");
+      }
+
+      const newMessage = {
+        text,
+        sender,
+        isExplicitWord: false,
+        timestamp: new Date(),
+      };
+
+      group.messages.push(newMessage);
+      await group.save();
+
+      // Emit the message to the room
+      io.to(setId).emit("receiveMessage", newMessage);
+    } catch (error) {
+      console.error(error);
+    }
   });
+
   socket.on("disconnect", () => {
     console.log("Client disconnected:", socket.id);
   });
 });
+
 //errors initialization
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
