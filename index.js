@@ -69,6 +69,10 @@ const io = new Server(server, {
   },
 });
 //route initialization
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
 app.use("/api/auth", authRoute);
 app.use("/api/admin-auth", adminAuthRoute);
 app.use("/api/users", userRoute);
@@ -93,31 +97,6 @@ io.on("connection", (socket) => {
   socket.on("joinDiscussion", ({ setId, userId }) => {
     socket.join(setId); // JOIN THE DISCUSSION
     console.log(`${userId} joined discussion ${setId}`);
-  });
-
-  socket.on("sendMessage", async ({ setId, text, sender }) => {
-    try {
-      const group = await SetDiscussion.findOne({ nosaSet: setId });
-
-      if (!group) {
-        throw new Error("Group discussion not found for this set");
-      }
-
-      const newMessage = {
-        text,
-        sender,
-        isExplicitWord: false,
-        timestamp: new Date(),
-      };
-
-      group.messages.push(newMessage);
-      await group.save();
-
-      // Emit the message to the room
-      io.to(setId).emit("receiveMessage", newMessage);
-    } catch (error) {
-      console.error(error);
-    }
   });
 
   socket.on("disconnect", () => {

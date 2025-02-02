@@ -18,6 +18,7 @@ const sendMessage = async (req, res, next) => {
     if (!req.user.isSetAdminVerify) {
       throw new CustomError.BadRequestError("You are not verified by your set admin");
     }
+
     const newMessage = {
       text,
       sender: req.user.id,
@@ -26,17 +27,16 @@ const sendMessage = async (req, res, next) => {
     };
 
     group.messages.push(newMessage);
-
     await group.save();
-    // Emit the message to the group chat
-    io.to(setId).emit("newMessage", { text, sender: req.user.id, timestamp: new Date() });
+
+    // Emit the message to the room
+    req.io.to(setId).emit("receiveMessage", newMessage);
 
     res.status(StatusCodes.CREATED).json({ success: true, message: "Message sent successfully" });
   } catch (error) {
     next(error);
   }
 };
-
 const getAllSetMessage = async (req, res, next) => {
   try {
     const { setId } = req.query;
