@@ -2,6 +2,7 @@ require("dotenv").config(); //to get resources from .env file
 const http = require("http");
 const { Server } = require("socket.io");
 const SetDiscussion = require("./model/setDisscussionModel");
+const User = require("./model/userModel");
 // express
 const express = require("express");
 const app = express();
@@ -98,7 +99,23 @@ io.on("connection", (socket) => {
     socket.join(setId); // JOIN THE DISCUSSION
     console.log(`${userId} joined discussion ${setId}`);
   });
+  socket.on("sendMessage", async (data) => {
+    const { setId, text, sender } = data;
+    const senderDetails = await User.findById(sender).select("firstName surname");
+    const newMessage = {
+      text,
+      sender: {
+        _id: senderDetails._id,
+        firstName: senderDetails.firstName,
+        surname: senderDetails.surname,
+        fullName: `${senderDetails.firstName} ${senderDetails.surname}`,
+      },
+      isExplicitWord: false,
+      timestamp: new Date(),
+    };
 
+    io.to(setId).emit("receiveMessage", newMessage); // Broadcast the message to the room
+  });
   socket.on("disconnect", () => {
     console.log("Client disconnected:", socket.id);
   });
