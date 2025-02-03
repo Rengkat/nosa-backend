@@ -6,8 +6,8 @@ const fs = require("node:fs");
 const createPost = async (req, res, next) => {
   try {
     const { content, image, nosaSet, isPinned } = req.body;
-    console.log({ content, image, nosaSet, isPinned });
-    if (!content || !nosaSet) {
+
+    if (!nosaSet) {
       throw new CustomError.BadRequestError("Please provide content and set");
     }
 
