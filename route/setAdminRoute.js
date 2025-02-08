@@ -1,5 +1,9 @@
 const express = require("express");
-const { getAllSetAdmins, makeSetAdmin } = require("../controllers/setAdminController");
+const {
+  getAllSetAdmins,
+  makeSetAdmin,
+  removeSetAdmin,
+} = require("../controllers/setAdminController");
 const {
   authenticateUser,
   superAdminAuthorizationPermission,
@@ -9,12 +13,7 @@ const {
 const router = express.Router();
 router
   .route("/")
-  .post(
-    [authenticateUser, superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin")],
-    makeSetAdmin
-  )
-  .get(
-    [authenticateUser, superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin")],
-    getAllSetAdmins
-  );
+  .post([authenticateUser, superAdminAuthorizationPermission], makeSetAdmin)
+  .get([authenticateUser, superAdminAuthorizationPermission], getAllSetAdmins)
+  .delete([authenticateUser, superAdminAuthorizationPermission], removeSetAdmin);
 module.exports = router;

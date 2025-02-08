@@ -43,4 +43,29 @@ const getAllSetAdmins = async (req, res, next) => {
     next(error);
   }
 };
-module.exports = { getAllSetAdmins, makeSetAdmin };
+const removeSetAdmin = async (req, res, next) => {
+  try {
+    const { userId, setId } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new CustomError.NotFoundError("User not found");
+    }
+
+    if (user.role !== "setAdmin" || user.nosaSet.toString() !== setId) {
+      throw new CustomError.BadRequestError("User is not a setAdmin for this set");
+    }
+
+    user.role = "member";
+    await user.save();
+
+    res.status(StatusCodes.OK).json({
+      message: "Set admin removed successfully",
+      success: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { getAllSetAdmins, makeSetAdmin, removeSetAdmin };
