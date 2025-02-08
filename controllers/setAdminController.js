@@ -15,7 +15,7 @@ const makeSetAdmin = async (req, res, next) => {
 
     if (existingSetAdmin) {
       if (existingSetAdmin._id.toString() === userId) {
-        throw new CustomError("User is already the setAdmin");
+        throw new CustomError.BadRequestError("User is already the setAdmin");
       }
 
       existingSetAdmin.role = "member";
