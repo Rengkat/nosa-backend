@@ -114,16 +114,16 @@ const getSetUnVerifiedMembers = async (req, res, next) => {
   }
 };
 
-const getSetAdmins = async (req, res, next) => {
-  try {
-    const setAdmins = await User.find({ role: "setAdmin" })
-      .sort("-yearOfGraduation")
-      .select("-password");
-    res.status(StatusCodes.OK).json({ setAdmins });
-  } catch (error) {
-    next(error);
-  }
-};
+// const getSetAdmins = async (req, res, next) => {
+//   try {
+//     const setAdmins = await User.find({ role: "setAdmin" })
+//       .sort("-yearOfGraduation")
+//       .select("-password");
+//     res.status(StatusCodes.OK).json({ setAdmins });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 const getSingleSet = async (req, res, next) => {
   try {
     const { setId } = req.params;
@@ -193,7 +193,6 @@ const uploadCoverImage = async (req, res, next) => {
 module.exports = {
   createSet,
   getAllSets,
-  getSetAdmins,
   getSetVerifiedMembers,
   getSetUnVerifiedMembers,
   uploadBannerImage,

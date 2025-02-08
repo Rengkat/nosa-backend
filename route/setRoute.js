@@ -2,7 +2,6 @@ const express = require("express");
 const {
   createSet,
   getAllSets,
-  getSetAdmins,
   getSetVerifiedMembers,
   getSetUnVerifiedMembers,
   uploadBannerImage,
@@ -22,12 +21,6 @@ router
   .get(getAllSets)
   .post([authenticateUser, superAdminAuthorizationPermission], createSet);
 
-router
-  .route("/setAdmins")
-  .get(
-    [authenticateUser, superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin")],
-    getSetAdmins
-  );
 router.post(
   "/upload-banner",
   authenticateUser,
