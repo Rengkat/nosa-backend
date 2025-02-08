@@ -8,7 +8,7 @@ const {
 
 const router = express.Router();
 router
-  .route("/setAdmins")
+  .route("/")
   .get(
     [authenticateUser, superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin")],
     getAllSetAdmins

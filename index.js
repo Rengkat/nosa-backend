@@ -34,6 +34,7 @@ const setPostsRoute = require("./route/setPostRouter");
 const setMediaRoute = require("./route/setMediaRoute");
 const setPostCommentRoute = require("./route/setPostCommentRoute");
 const setDiscussionRoute = require("./route/setDiscussionRoute");
+const setAdminsRoute = require("./route/setAdminRoute");
 //middlewares importations
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
@@ -90,6 +91,7 @@ app.use("/api/events", eventRoute);
 app.use("/api/showcase", showcaseRoute);
 app.use("/api/achievements", achievementRoute);
 app.use("/api/stats", statsRoute);
+app.use("/api/set-admins", setAdminsRoute);
 
 // socket
 io.on("connection", (socket) => {
