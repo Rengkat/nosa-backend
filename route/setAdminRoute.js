@@ -1,6 +1,16 @@
+const express = require("express");
+const { getAllSetAdmins } = require("../controllers/setAdminController");
+const {
+  authenticateUser,
+  superAdminAuthorizationPermission,
+  superAdminAndSetAdminAuthorizationPermission,
+} = require("../middleware/authentication");
+
+const router = express.Router();
 router
   .route("/setAdmins")
   .get(
     [authenticateUser, superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin")],
-    getSetAdmins
+    getAllSetAdmins
   );
+module.exports = router;
