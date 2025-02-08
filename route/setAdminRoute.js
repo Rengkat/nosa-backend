@@ -1,5 +1,5 @@
 const express = require("express");
-const { getAllSetAdmins } = require("../controllers/setAdminController");
+const { getAllSetAdmins, makeSetAdmin } = require("../controllers/setAdminController");
 const {
   authenticateUser,
   superAdminAuthorizationPermission,
@@ -9,6 +9,10 @@ const {
 const router = express.Router();
 router
   .route("/")
+  .post(
+    [authenticateUser, superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin")],
+    makeSetAdmin
+  )
   .get(
     [authenticateUser, superAdminAndSetAdminAuthorizationPermission("superAdmin", "setAdmin")],
     getAllSetAdmins

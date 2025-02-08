@@ -43,4 +43,4 @@ const getAllSetAdmins = async (req, res, next) => {
     next(error);
   }
 };
-module.exports = { getAllSetAdmins };
+module.exports = { getAllSetAdmins, makeSetAdmin };
