@@ -37,7 +37,11 @@ const getAllSetAdmins = async (req, res, next) => {
   try {
     const setAdmins = await User.find({ role: "setAdmin" })
       .sort("-yearOfGraduation")
-      .select("-password");
+      .select("-password")
+      .populate({
+        path: "nosaSet",
+        select: "name -_id",
+      });
     res.status(StatusCodes.OK).json({ setAdmins });
   } catch (error) {
     next(error);
@@ -45,14 +49,13 @@ const getAllSetAdmins = async (req, res, next) => {
 };
 const removeSetAdmin = async (req, res, next) => {
   try {
-    const { userId, setId } = req.body;
-
+    const { userId } = req.params;
     const user = await User.findById(userId);
     if (!user) {
       throw new CustomError.NotFoundError("User not found");
     }
 
-    if (user.role !== "setAdmin" || user.nosaSet.toString() !== setId) {
+    if (user.role !== "setAdmin") {
       throw new CustomError.BadRequestError("User is not a setAdmin for this set");
     }
 

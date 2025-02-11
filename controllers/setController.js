@@ -52,7 +52,6 @@ const getSetVerifiedMembers = async (req, res, next) => {
     const limit = Number(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    // Find the set and populate members
     const nosaSet = await NosaSet.findById(setId).populate({
       path: "members",
       match: { isSetAdminVerify: true },

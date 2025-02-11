@@ -116,7 +116,7 @@ io.on("connection", (socket) => {
       timestamp: new Date(),
     };
 
-    io.to(setId).emit("receiveMessage", newMessage); // Broadcast the message to the room
+    io.to(setId).emit("receiveMessage", newMessage);
   });
   socket.on("disconnect", () => {
     console.log("Client disconnected:", socket.id);

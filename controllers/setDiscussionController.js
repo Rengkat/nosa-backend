@@ -18,6 +18,9 @@ const sendMessage = async (req, res, next) => {
     if (!req.user.isSetAdminVerify) {
       throw new CustomError.BadRequestError("You are not verified by your set admin");
     }
+    if (req.user.status === "blocked") {
+      throw new CustomError.BadRequestError("You are blocked");
+    }
 
     const newMessage = {
       text,

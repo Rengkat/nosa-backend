@@ -14,6 +14,8 @@ const router = express.Router();
 router
   .route("/")
   .post([authenticateUser, superAdminAuthorizationPermission], makeSetAdmin)
-  .get([authenticateUser, superAdminAuthorizationPermission], getAllSetAdmins)
+  .get([authenticateUser, superAdminAuthorizationPermission], getAllSetAdmins);
+router
+  .route("/:userId")
   .delete([authenticateUser, superAdminAuthorizationPermission], removeSetAdmin);
 module.exports = router;
