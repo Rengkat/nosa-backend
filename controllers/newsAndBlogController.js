@@ -31,21 +31,47 @@ const addNewsAndBlog = async (req, res, next) => {
     next(error);
   }
 };
-
 const getAllNewsAndBlogs = async (req, res, next) => {
+  let { category } = req.query;
+
   try {
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
+    const query = {};
+
+    if (category) {
+      const categoriesArray = category.split(",");
+      query.category = { $in: categoriesArray };
+    }
+
+    const page = Math.max(1, Number(req.query.page)) || 1;
+    const limit = Math.max(1, Number(req.query.limit)) || 10;
     const skip = (page - 1) * limit;
 
-    const totalNewsAndBlogs = await NewsAndBlog.countDocuments();
+    const totalNewsAndBlogs = await NewsAndBlog.countDocuments(query);
 
-    const newsAndBlogs = await NewsAndBlog.find().skip(skip).limit(limit);
+    const newsAndBlogs = await NewsAndBlog.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
     const totalPages = Math.ceil(totalNewsAndBlogs / limit);
-    res
-      .status(StatusCodes.OK)
-      .json({ data: newsAndBlogs, totalNewsAndBlogs, currentPage: page, limit, totalPages });
+
+    if (!newsAndBlogs.length) {
+      return res.status(StatusCodes.OK).json({
+        data: [],
+        totalNewsAndBlogs: 0,
+        currentPage: page,
+        limit,
+        totalPages: 0,
+      });
+    }
+
+    res.status(StatusCodes.OK).json({
+      data: newsAndBlogs,
+      totalNewsAndBlogs,
+      currentPage: page,
+      limit,
+      totalPages,
+    });
   } catch (error) {
     next(error);
   }

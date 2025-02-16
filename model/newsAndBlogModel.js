@@ -12,6 +12,10 @@ const NewsAndBlogSchema = new mongoose.Schema(
       enum: ["news", "blog"],
       required: [true, "Please select category"],
     },
+    isPopular: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

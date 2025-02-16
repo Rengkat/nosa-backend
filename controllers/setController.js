@@ -6,13 +6,13 @@ const cloudinary = require("cloudinary").v2;
 const fs = require("node:fs");
 const createSet = async (req, res, next) => {
   try {
-    const { nosaSet, description } = req.body;
+    const { nosaSet, description, banner, coverImage } = req.body;
     if (!nosaSet) throw new CustomError.BadRequestError("Please provide set year");
 
     const existingSet = await NosaSet.findOne({ name: nosaSet });
     if (existingSet) throw new CustomError.BadRequestError("Set already exists");
 
-    await NosaSet.create({ name: nosaSet, description });
+    await NosaSet.create({ name: nosaSet, description, banner, coverImage });
     res.status(StatusCodes.CREATED).json({ message: "A set created successfully", success: true });
   } catch (error) {
     next(error);
