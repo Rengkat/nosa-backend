@@ -32,8 +32,23 @@ const addEvent = async (req, res, next) => {
 
 const getAllEvents = async (req, res, next) => {
   try {
-    const events = await Event.find({});
-    res.status(StatusCodes.OK).json(events);
+    const page = Math.max(1, parseInt(req.query.page)) || 1;
+    const limit = Math.max(1, parseInt(req.query.limit)) || 10;
+    const skip = (page - 1) * limit;
+
+    const totalEvents = await Event.countDocuments({});
+
+    const events = await Event.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit);
+
+    const totalPages = Math.ceil(totalEvents / limit);
+
+    res.status(StatusCodes.OK).json({
+      data: events,
+      totalEvents,
+      currentPage: page,
+      limit,
+      totalPages,
+    });
   } catch (error) {
     next(error);
   }
