@@ -7,7 +7,7 @@ const fs = require("node:fs");
 
 const addNewsAndBlog = async (req, res, next) => {
   try {
-    const { image, title, content, category, user, description } = req.body;
+    const { image, title, content, category, user, description, isPopular } = req.body;
 
     // Check if required fields are provided
     if (!image || !content || !title || !category) {
@@ -21,6 +21,7 @@ const addNewsAndBlog = async (req, res, next) => {
       category,
       user,
       description,
+      isPopular,
     });
 
     res.status(StatusCodes.CREATED).json({

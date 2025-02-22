@@ -6,15 +6,15 @@ const SocialMediaSchema = new mongoose.Schema({
   platform: {
     type: String,
     enum: ["twitter", "linkedin", "facebook", "email"],
-    required: true,
+    // required: true,
   },
   url: {
     type: String,
-    required: true,
-    validate: {
-      validator: validator.isURL,
-      message: "Please provide a valid URL",
-    },
+    // required: true,
+    // validate: {
+    //   validator: validator.isURL,
+    //   message: "Please provide a valid URL",
+    // },
   },
 });
 
@@ -26,18 +26,26 @@ const UserSchema = new mongoose.Schema(
     },
     surname: {
       type: String,
-      required: [true, "Please provide name"],
+      required: [true, "Please provide surname"],
     },
     email: {
       type: String,
       required: [true, "Please provide email"],
+      unique: true,
       validate: {
         validator: validator.isEmail,
         message: "Please provide a valid email",
       },
     },
     phone: {
-      type: String, //will be unique when everything is done
+      type: String,
+      unique: true,
+      validate: {
+        validator: function (value) {
+          return validator.isMobilePhone(value, "any");
+        },
+        message: "Please provide a valid phone number",
+      },
     },
     password: {
       type: String,
@@ -57,40 +65,37 @@ const UserSchema = new mongoose.Schema(
     },
     title: {
       type: String,
-      required: false,
+      default: "",
     },
     currentJob: {
       type: String,
-      required: false,
+      default: "",
     },
     employer: {
       type: String,
-      required: false,
+      default: "",
     },
     yearOfGraduation: {
       type: String,
-      required: false,
+      default: "",
     },
     nosaSet: {
       type: mongoose.Types.ObjectId,
       ref: "NosaSet",
-      required: false,
     },
     position: {
       type: String,
-      required: false,
+      default: "",
     },
     image: {
       type: String,
-      required: false,
+      default: "",
     },
-
     socialMedia: [SocialMediaSchema],
-
     maritalStatus: {
       type: String,
       enum: ["single", "married", "divorced", "complicated"],
-      required: false,
+      default: "single",
     },
     role: {
       type: String,
@@ -121,19 +126,28 @@ const UserSchema = new mongoose.Schema(
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
 UserSchema.virtual("fullName").get(function () {
   return `${this.firstName} ${this.surname}`;
 });
-UserSchema.pre("save", async function () {
-  if (!this.isModified("password")) {
-    return;
+
+UserSchema.pre("save", async function (next) {
+  if (this.isModified("password")) {
+    const salt = await bcrypt.genSalt(12);
+    this.password = await bcrypt.hash(this.password, salt);
   }
-  const salt = await bcrypt.genSalt(12);
-  this.password = await bcrypt.hash(this.password, salt);
+  if (this.role === "superAdmin") {
+    this.isSetAdminVerify = true;
+  }
+  next();
 });
 
 UserSchema.methods.comparedPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
+
+UserSchema.index({ email: 1 });
+UserSchema.index({ role: 1 });
+UserSchema.index({ status: 1 });
 
 module.exports = mongoose.model("User", UserSchema);

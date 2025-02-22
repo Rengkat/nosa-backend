@@ -7,11 +7,23 @@ const fs = require("node:fs");
 
 const addEvent = async (req, res, next) => {
   try {
-    const { image, title, content, description } = req.body;
+    const { isPopular, image, title, content, description, dateOfEvent, venue } = req.body;
 
     // Check if required fields are provided
-    if (!image || !content || !title) {
-      throw new CustomError.BadRequestError("Please provide all details");
+    if (
+      !image ||
+      !title ||
+      !content ||
+      !dateOfEvent ||
+      !venue ||
+      !venue.name ||
+      !venue.address ||
+      !venue.city ||
+      !venue.state ||
+      !venue.country ||
+      !venue.zipCode
+    ) {
+      throw new CustomError.BadRequestError("Please provide all required details");
     }
 
     await Event.create({
@@ -19,10 +31,13 @@ const addEvent = async (req, res, next) => {
       title,
       content,
       description,
+      dateOfEvent,
+      venue,
+      isPopular,
     });
 
     res.status(StatusCodes.CREATED).json({
-      message: `An event has been published`,
+      message: `Event has been published successfully`,
       success: true,
     });
   } catch (error) {
@@ -62,17 +77,18 @@ const getSingleEvent = async (req, res, next) => {
     }
     const event = await Event.findById(id).populate("user", "-password");
     if (!event) {
-      throw new CustomError.NotFoundError("Article not found");
+      throw new CustomError.NotFoundError("Event not found");
     }
     res.status(StatusCodes.OK).json(event);
   } catch (error) {
     next(error);
   }
 };
+
 const updateEvent = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { image, title, content, description } = req.body;
+    const { image, title, content, description, dateOfEvent, venue } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new CustomError.BadRequestError("Invalid ID format");
@@ -80,12 +96,12 @@ const updateEvent = async (req, res, next) => {
 
     const updatedEvent = await Event.findByIdAndUpdate(
       id,
-      { image, title, content, description },
+      { image, title, content, description, dateOfEvent, venue },
       { new: true, runValidators: true }
     );
 
     if (!updatedEvent) {
-      throw new CustomError.NotFoundError("Resources not found");
+      throw new CustomError.NotFoundError("Event not found");
     }
 
     res.status(StatusCodes.OK).json({
@@ -105,7 +121,7 @@ const removeEvent = async (req, res, next) => {
     }
     const event = await Event.findByIdAndDelete(id);
     if (!event) {
-      throw new CustomError.NotFoundError("Result not found");
+      throw new CustomError.NotFoundError("Event not found");
     }
     res.status(StatusCodes.OK).json({ message: `Event deleted successfully`, success: true });
   } catch (error) {
@@ -120,7 +136,6 @@ const uploadEventImage = async (req, res, next) => {
     }
 
     if (!fs.existsSync(req.files.image.tempFilePath)) {
-      // the file path
       throw new CustomError.BadRequestError("File not found");
     }
 

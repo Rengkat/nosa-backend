@@ -50,7 +50,11 @@ cloudniary.config({
   api_secret: process.env.CLOUTINARY_CLOUD_API_SECRET,
 });
 // app.use(cors());
-const allowedOrigins = ["http://localhost:3000", "https://nosa-nakam.vercel.app"];
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "https://nosa-nakam.vercel.app",
+];
 
 app.use(
   cors({
@@ -71,6 +75,7 @@ const io = new Server(server, {
   },
 });
 //route initialization
+
 app.use((req, res, next) => {
   req.io = io;
   next();

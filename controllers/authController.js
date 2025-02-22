@@ -7,45 +7,58 @@ const { attachTokenToResponse, createUserPayload, sendVerificationEmail } = requ
 const crypto = require("crypto");
 const register = async (req, res, next) => {
   const { firstName, surname, email, password, nosaSet } = req.body;
+
   try {
-    if (!firstName || !surname || !email || !password || !nosaSet) {
+    // Validate required fields
+    if (!firstName || !surname || !email || !password) {
       throw new CustomError.BadRequestError("Please provide all credentials");
     }
 
+    // Check if the user already exists
     const existUser = await User.findOne({ email });
     if (existUser) {
       throw new CustomError.BadRequestError("User already registered");
     }
 
+    // Determine the user's role
     const userCount = await User.countDocuments();
     const assignedRole = userCount === 0 ? "superAdmin" : "member";
-    //CREATE TOKEN
+
+    // Create email verification token
     const oneHour = 1000 * 60 * 60;
     const emailVerificationToken = crypto.randomBytes(40).toString("hex");
     const emailVerificationTokenExpirationDate = new Date(Date.now() + oneHour);
+
+    // Create the user
     const user = await User.create({
       firstName,
       surname,
       email,
       password,
-      nosaSet,
+      nosaSet: assignedRole === "superAdmin" ? null : nosaSet,
       role: assignedRole,
       emailVerificationToken,
       emailVerificationTokenExpirationDate,
     });
-    const set = await NosaSet.findById(nosaSet);
-    if (!set) {
-      throw new CustomError.NotFoundError("Not found NOSA set");
+
+    // If the user is not a superAdmin, add them to the nosaSet
+    if (assignedRole !== "superAdmin" && nosaSet) {
+      const set = await NosaSet.findById(nosaSet);
+      if (!set) {
+        throw new CustomError.NotFoundError("Not found NOSA set");
+      }
+      set.members.push(user._id);
+      await set.save();
     }
-    set.members.push(user._id);
-    await set.save();
-    //send verification code
+
+    // Send verification email
     await sendVerificationEmail({
       firstName: user.firstName,
       email: user.email,
       verificationToken: user.emailVerificationToken,
       origin: process.env.ORIGIN,
     });
+
     res.status(StatusCodes.CREATED).json({
       message: "Registration successful. Please check your email and verify it",
       success: true,
@@ -54,7 +67,6 @@ const register = async (req, res, next) => {
     next(error);
   }
 };
-
 const verifyEmail = async (req, res, next) => {
   try {
     const { email, verificationToken } = req.body;
@@ -117,7 +129,7 @@ const login = async (req, res, next) => {
     if (!user.isVerified) {
       throw new CustomError.UnauthenticatedError("Please verify your email");
     }
-    if (!user.isSetAdminVerify) {
+    if (user.role !== "superAdmin" || !user.isSetAdminVerify) {
       throw new CustomError.UnauthenticatedError("Your set admin is yet to approve your request");
     }
     //refresh token

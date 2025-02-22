@@ -25,7 +25,7 @@ router.get(
   superAdminAuthorizationPermission,
   getAllUnverifiedUsers
 );
-router.route("/uploadUserImage").post(authenticateUser, uploadUserImage);
+router.route("/uploadUserImage").post(uploadUserImage);
 router.put("/updateCurrentUser", authenticateUser, updateCurrentUser);
 router.patch(
   "/verify-by-setAdmin",

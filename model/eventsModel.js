@@ -5,6 +5,10 @@ const EventSchema = new mongoose.Schema(
     image: { type: String, required: [true, "Please provide image link"] },
     title: { type: String, required: [true, "Please provide the title"], maxLength: 100 },
     description: { type: String },
+    isPopular: {
+      type: Boolean,
+      default: false,
+    },
     dateOfEvent: {
       type: Date,
       required: [true, "Please provide the date of the event"],
