@@ -35,6 +35,7 @@ const setMediaRoute = require("./route/setMediaRoute");
 const setPostCommentRoute = require("./route/setPostCommentRoute");
 const setDiscussionRoute = require("./route/setDiscussionRoute");
 const setAdminsRoute = require("./route/setAdminRoute");
+const NewsLetterRoute = require("./route/NewsLetter");
 //middlewares importations
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
@@ -97,7 +98,7 @@ app.use("/api/showcase", showcaseRoute);
 app.use("/api/achievements", achievementRoute);
 app.use("/api/stats", statsRoute);
 app.use("/api/set-admins", setAdminsRoute);
-
+app.use("/api/newsletter", NewsLetterRoute);
 // socket
 io.on("connection", (socket) => {
   console.log("New user is connected", socket.id);
