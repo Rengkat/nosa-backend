@@ -40,12 +40,6 @@ const UserSchema = new mongoose.Schema(
     phone: {
       type: String,
       unique: true,
-      validate: {
-        validator: function (value) {
-          return validator.isMobilePhone(value, "any");
-        },
-        message: "Please provide a valid phone number",
-      },
     },
     password: {
       type: String,
@@ -88,6 +82,10 @@ const UserSchema = new mongoose.Schema(
       default: "",
     },
     image: {
+      type: String,
+      default: "",
+    },
+    banner: {
       type: String,
       default: "",
     },

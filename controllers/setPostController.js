@@ -11,11 +11,13 @@ const createPost = async (req, res, next) => {
       throw new CustomError.BadRequestError("Please provide content and set");
     }
 
-    if (req.user.nosaSet !== nosaSet) {
+    // Allow superAdmin to post regardless of nosaSet
+    if (req.user.role !== "superAdmin" && req.user.nosaSet !== nosaSet) {
       throw new CustomError.UnauthorizedError(
         "You are not authorized to post in this group. You are not a set member"
       );
     }
+
     await SetPost.create({ content, image, nosaSet, author: req.user.id, isPinned });
 
     res.status(StatusCodes.CREATED).json({ message: "Post created successfully", success: true });

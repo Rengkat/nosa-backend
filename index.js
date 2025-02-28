@@ -35,7 +35,7 @@ const setMediaRoute = require("./route/setMediaRoute");
 const setPostCommentRoute = require("./route/setPostCommentRoute");
 const setDiscussionRoute = require("./route/setDiscussionRoute");
 const setAdminsRoute = require("./route/setAdminRoute");
-const NewsLetterRoute = require("./route/NewsLetter");
+const NewsLetterRoute = require("./route/newsletterRoute");
 //middlewares importations
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");

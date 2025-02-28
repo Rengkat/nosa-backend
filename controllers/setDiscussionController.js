@@ -15,11 +15,9 @@ const sendMessage = async (req, res, next) => {
     if (!group) {
       throw new CustomError.NotFoundError("Group discussion not found for this set");
     }
-    if (!req.user.isSetAdminVerify) {
-      throw new CustomError.BadRequestError("You are not verified by your set admin");
-    }
+
     if (req.user.status === "blocked") {
-      throw new CustomError.BadRequestError("You are blocked");
+      throw new CustomError.BadRequestError("You are blocked contact your set admin");
     }
 
     const newMessage = {

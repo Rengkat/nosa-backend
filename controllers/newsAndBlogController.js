@@ -52,7 +52,8 @@ const getAllNewsAndBlogs = async (req, res, next) => {
     const newsAndBlogs = await NewsAndBlog.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .select("title description image");
 
     const totalPages = Math.ceil(totalNewsAndBlogs / limit);
 

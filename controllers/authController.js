@@ -7,7 +7,6 @@ const { attachTokenToResponse, createUserPayload, sendVerificationEmail } = requ
 const crypto = require("crypto");
 const register = async (req, res, next) => {
   const { firstName, surname, email, password, nosaSet } = req.body;
-
   try {
     // Validate required fields
     if (!firstName || !surname || !email || !password) {
@@ -129,9 +128,7 @@ const login = async (req, res, next) => {
     if (!user.isVerified) {
       throw new CustomError.UnauthenticatedError("Please verify your email");
     }
-    if (user.role !== "superAdmin" || !user.isSetAdminVerify) {
-      throw new CustomError.UnauthenticatedError("Your set admin is yet to approve your request");
-    }
+
     //refresh token
     let refreshToken = "";
     const userPayload = createUserPayload(user);

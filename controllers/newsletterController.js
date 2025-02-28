@@ -1,4 +1,4 @@
-const NewLetter = require("../model/newsLetter");
+const NewsLetter = require("../model/newsLetterModel");
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError } = require("../errors");
 const subscribeToNewsLetter = async (req, res, next) => {
@@ -9,12 +9,12 @@ const subscribeToNewsLetter = async (req, res, next) => {
       throw new BadRequestError("Email is required");
     }
 
-    const existingSubscriber = await NewLetter.findOne({ email });
+    const existingSubscriber = await NewsLetter.findOne({ email });
     if (existingSubscriber) {
       throw new BadRequestError("Email is already subscribed");
     }
 
-    const newSubscriber = await NewLetter.create({ email });
+    const newSubscriber = await NewsLetter.create({ email });
 
     res.status(StatusCodes.CREATED).json({
       success: true,
@@ -32,12 +32,12 @@ const unsubscribeFromNewsLetter = async (req, res, next) => {
       throw new BadRequestError("Email is required");
     }
 
-    const subscriber = await NewLetter.findOne({ email });
+    const subscriber = await NewsLetter.findOne({ email });
     if (!subscriber) {
       throw new NotFoundError("Email is not subscribed");
     }
 
-    await NewLetter.deleteOne({ email });
+    await NewsLetter.deleteOne({ email });
 
     res.status(StatusCodes.OK).json({
       success: true,

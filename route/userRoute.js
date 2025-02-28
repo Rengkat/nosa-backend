@@ -10,6 +10,7 @@ const {
   getAllUnverifiedUsers,
   forgotPassword,
   resetPassword,
+  uploadUserBanner,
 } = require("../controllers/userController");
 const {
   authenticateUser,
@@ -26,6 +27,7 @@ router.get(
   getAllUnverifiedUsers
 );
 router.route("/uploadUserImage").post(uploadUserImage);
+router.route("/uploadUserBanner").post(uploadUserBanner);
 router.put("/updateCurrentUser", authenticateUser, updateCurrentUser);
 router.patch(
   "/verify-by-setAdmin",

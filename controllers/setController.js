@@ -129,10 +129,16 @@ const getSingleSet = async (req, res, next) => {
     if (!setId) {
       throw new CustomError.BadRequestError("Please provide set ID");
     }
-    const set = await NosaSet.findById(setId);
+
+    const set = await NosaSet.findById(setId).populate({
+      path: "members",
+      select: "firstName surname isSetAdminVerify",
+    });
+
     if (!set) {
       throw new CustomError.NotFoundError("Set not found");
     }
+
     res.status(StatusCodes.OK).json({ set });
   } catch (error) {
     next(error);

@@ -18,7 +18,9 @@ const addImage = async (req, res, next) => {
     if (!mongoose.Types.ObjectId.isValid(nosaSet)) {
       throw new CustomError.BadRequestError("Invalid Nosa Set ID format");
     }
-
+    if (user.role !== "superAdmin" || !req.user.isSetAdminVerify) {
+      throw new CustomError.BadRequestError("You are not verified by your set admin");
+    }
     await SetMedia.create({
       imageUrl,
       caption,

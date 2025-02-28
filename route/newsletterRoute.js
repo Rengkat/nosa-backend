@@ -1,5 +1,8 @@
 const express = require("express");
-const { subscribeToNewsLetter, unsubscribeFromNewsLetter } = require("../controllers/NewLetter");
+const {
+  subscribeToNewsLetter,
+  unsubscribeFromNewsLetter,
+} = require("../controllers/newsletterController");
 const route = express.Router();
 
 route.post("/subscribe", subscribeToNewsLetter);
