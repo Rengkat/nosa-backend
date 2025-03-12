@@ -23,7 +23,7 @@ router.post(
   uploadEventImage
 );
 router
-  .route("/:id")
+  .route("/:eventId")
   .get(getSingleEvent)
   .patch([authenticateUser, superAdminAuthorizationPermission], updateEvent)
   .delete([authenticateUser, superAdminAuthorizationPermission], removeEvent);

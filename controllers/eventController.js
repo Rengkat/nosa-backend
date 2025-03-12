@@ -71,17 +71,15 @@ const getAllEvents = async (req, res, next) => {
 
 const getSingleEvent = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    console.log(id);
+    const { eventId: id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new CustomError.BadRequestError("Invalid ID format");
     }
-    const event = await Event.findById(id).populate("user", "-password");
-    console.log(event);
+    const event = await Event.findById(id);
     if (!event) {
       throw new CustomError.NotFoundError("Event not found");
     }
-    res.status(StatusCodes.OK).json(event);
+    res.status(StatusCodes.OK).json({ data: event });
   } catch (error) {
     next(error);
   }
