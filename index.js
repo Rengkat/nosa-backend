@@ -51,16 +51,26 @@ cloudniary.config({
   api_secret: process.env.CLOUTINARY_CLOUD_API_SECRET,
 });
 // app.use(cors());
-const allowedOrigins = ["http://localhost:3000", "https://nosa-nakam-panyam.vercel.app"];
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://nosa-nakam-panyam.vercel.app",
+  /\.vercel\.app$/, // Allow all Vercel preview URLs
+];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      // Check allowed origins
+      if (
+        allowedOrigins.includes(origin) ||
+        allowedOrigins.some((allowed) => allowed instanceof RegExp && allowed.test(origin))
+      ) {
+        return callback(null, true);
       }
+      callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
     exposedHeaders: ["set-cookie"],
