@@ -5,21 +5,26 @@ const createJwt = ({ payload }) => {
 };
 const isTokenVerified = (token) => jwt.verify(token, process.env.JWT_SECRET);
 const attachTokenToResponse = ({ res, userPayload, refreshToken }) => {
+  const isProduction = process.env.NODE_ENV === "production";
   const accessTokenJWT = createJwt({ payload: { accessToken: userPayload } });
   const refreshTokenJWT = createJwt({ payload: { accessToken: userPayload, refreshToken } });
   const expiringDate = 1000 * 60 * 60 * 24 * 30; // 30 days
+
+  const commonCookieOptions = {
+    httpOnly: true,
+    signed: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+  };
+
   res.cookie("accessToken", accessTokenJWT, {
-    httpOnly: true,
+    ...commonCookieOptions,
     maxAge: 1000 * 60 * 5,
-    signed: true, // app is using cookie-parser with a secret
-    secure: false, // False for development (local)
   });
+
   res.cookie("refreshToken", refreshTokenJWT, {
-    httpOnly: true,
+    ...commonCookieOptions,
     expires: new Date(Date.now() + expiringDate),
-    signed: true, // app is using cookie-parser with a secret
-    secure: false, // False for development (local)
   });
-  return { accessTokenJWT };
 };
 module.exports = { isTokenVerified, attachTokenToResponse };

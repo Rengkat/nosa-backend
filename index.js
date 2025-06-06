@@ -63,6 +63,7 @@ app.use(
       }
     },
     credentials: true,
+    exposedHeaders: ["set-cookie"],
   })
 );
 const io = new Server(server, {
